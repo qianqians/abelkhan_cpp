@@ -9,22 +9,22 @@ namespace common
 
 class modulemanager {
 public:
-	void add_module(FString module_name, TSharedPtr<imodule> module)
+	void add_module(std::string module_name, std::shared_ptr<imodule> module)
 	{
-		modules.Add(module_name, module);
+		modules.insert(std::make_pair(module_name, module));
 	}
 
-	public void process_module_mothed(FString module_name, FString cb_name, const TArray< TSharedPtr<FJsonValue> > & InArray)
+	void process_module_mothed(std::string module_name, std::string cb_name, std::shared_ptr<std::vector<boost::any> > InArray)
 	{
-		auto module = modules.Find(module_name);
-		if (module != nullptr)
+		auto module = modules.find(module_name);
+		if (module != modules.end())
 		{
-			(*module)->invoke(cb_name, InArray);
+			(module->second)->invoke(cb_name, InArray);
 		}
 	}
 
 private:
-	TMap<FString, TSharedPtr<imodule> > modules;
+	std::map<std::string, std::shared_ptr<imodule> > modules;
 
 };
 

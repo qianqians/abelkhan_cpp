@@ -1,30 +1,39 @@
 
-#ifndef _modulemng_h
-#define _modulemng_h
+#ifndef _connectservice_h
+#define _connectservice_h
 
-#include "module.h"
+#include "channel.h"
+#include "process_.h"
 
-namespace common
+namespace service
 {
 
-class modulemanager {
+class connectservice {
 public:
-	void add_module(FString module_name, TSharedPtr<imodule> module)
+	connectservice(std::shared_ptr<juggle::process> process)
 	{
-		modules.Add(module_name, module);
+		_process = process;
 	}
 
-	public void process_module_mothed(FString module_name, FString cb_name, const TArray< TSharedPtr<FJsonValue> > & InArray)
+	std::shared_ptr<juggle::Ichannel> connect(std::string ip, short port)
 	{
-		auto module = modules.Find(module_name);
-		if (module != nullptr)
-		{
-			(*module)->invoke(cb_name, InArray);
-		}
+		auto s = std::make_shared<boost::asio::ip::tcp::socket>(_service);
+		s->connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(ip), port));
+		auto ch = std::make_shared<channel>(s);
+
+		_process->reg_channel(ch);
+
+		return ch;
+	}
+
+	void poll()
+	{
+		_service.run_one();
 	}
 
 private:
-	TMap<FString, TSharedPtr<imodule> > modules;
+	boost::asio::io_service _service;
+	std::shared_ptr<juggle::process> _process;
 
 };
 

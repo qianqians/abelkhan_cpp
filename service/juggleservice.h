@@ -1,32 +1,32 @@
 
-#ifndef _module_h
-#define _module_h
+#ifndef _juggleservice_h
+#define _juggleservice_h
 
-#include "Json.h"
-#include "Map.h"
+#include "process_.h"
+
+#include <memory>
+#include <vector>
 
 namespace service
 {
 
 class juggleservice {
 public:
-	void reg_cb(FString cb_name, callback cb)
+	void add_process(std::shared_ptr<juggle::process> pc)
 	{
-		cbs.Add(cb_name, cb);
+		_ps.push_back(pc);
 	}
 
-	void invoke(FString cb_name, const TArray< TSharedPtr<FJsonValue> > & InArray)
+	void poll()
 	{
-		auto cb = cbs.Find(cb_name);
-		if (cb != nullptr)
+		for (auto pc : _ps)
 		{
-			cb(InArray);
+			pc->poll();
 		}
 	}
 
 private:
-	typedef void(*callback)(const TArray< TSharedPtr<FJsonValue> > & InArray);
-	TMap<FString, callback> cbs;
+	std::vector< std::shared_ptr<juggle::process> > _ps;
 
 };
 

@@ -1,62 +1,56 @@
 
-#ifndef _module_h
-#define _module_h
+#ifndef _timerservice_h
+#define _timerservice_h
 
-#include "Json.h"
-#include "Map.h"
+#include <time.h>
+
+#include <functional>
+#include <map>
+#include <vector>
 
 namespace service
 {
 
 class timerservice {
+private:
+	std::map<int64_t, std::function< void(int64_t) > > cbs;
+
 public:
-	void addticktimer(int64 _tick, callback cb, void * agrv)
+	void addticktimer(int64_t _tick, std::function< void(int64_t) > cb)
 	{
-		while (cbs.Find(_tick) != nullptr)
+		while (cbs.find(_tick) != cbs.end())
 		{
 			_tick++;
 		}
 
-		struct func _func;
-		_func.agrv = agrv;
-		_func.cb = cb;
-		cbs.Add(_tick, _func);
+		cbs.insert(std::make_pair(_tick, cb));
 	}
 
-	int64 poll()
+	int64_t poll()
 	{
 		Tick = time(nullptr);
 
-		TArray<int64> remove;
+		std::vector<int64_t> remove;
 		for (auto it = cbs.begin(); it != cbs.end(); it++)
 		{
-			if (it.Key() <= Tick)
+			if (it->first <= Tick)
 			{
-				it.Value().cb(agrv, Tick);
+				it->second(it->first);
 
-				remove.Add(it.Key());
+				remove.push_back(it->first);
 			}
 		}
 
-		for (auto i = 0; i < remove.Num(); i++)
+		for (auto key : remove)
 		{
-			cbs.Remove(remove[i]);
+			cbs.erase(key);
 		}
 
 		return Tick;
 	}
 
-private:
-	typedef void(*callback)(void * agrv, int64 tick);
-	struct func
-	{
-		void * agrv;
-		callback cb;
-	};
-	TMap<int64, func> cbs;
-
 public:
-	int64 Tick;
+	time_t Tick;
 
 };
 

@@ -1,8 +1,10 @@
 /*this module file is codegen by juggle for c++*/
 #ifndef _gate_call_client_module_h
 #define _gate_call_client_module_h
-
 #include "Imodule.h"
+#include <memory>
+#include <boost/signals2.hpp>
+#include <string>
 
 namespace module
 {
@@ -10,43 +12,37 @@ class gate_call_client : public juggle::Imodule {
 public:
     gate_call_client(){
         module_name = "gate_call_client";
-        protcolcall_set.Add("connect_gate_sucess_handle", &gate_call_client::connect_gate_sucess_handle);
-        protcolcall_set.Add("connect_hub_sucess_handle", &gate_call_client::connect_hub_sucess_handle);
-        protcolcall_set.Add("call_client_handle", &gate_call_client::call_client_handle);
+        protcolcall_set.insert(std::make_pair("connect_gate_sucess", std::bind(&gate_call_client::connect_gate_sucess, this, std::placeholders::_1)));
+        protcolcall_set.insert(std::make_pair("connect_hub_sucess", std::bind(&gate_call_client::connect_hub_sucess, this, std::placeholders::_1)));
+        protcolcall_set.insert(std::make_pair("ack_heartbeats", std::bind(&gate_call_client::ack_heartbeats, this, std::placeholders::_1)));
+        protcolcall_set.insert(std::make_pair("call_client", std::bind(&gate_call_client::call_client, this, std::placeholders::_1)));
     }
 
     ~gate_call_client(){
     }
 
-    virtual void connect_gate_sucess();
-    void connect_gate_sucess_handle(const TArray< TSharedPtr<FJsonValue> >& _event){
-        connect_gate_sucess();
+    boost::signals2::signal<void() > sig_connect_gate_sucess;
+    void connect_gate_sucess(std::shared_ptr<std::vector<boost::any> > _event){
+        sig_connect_gate_sucess();
     }
 
-    virtual void connect_hub_sucess(FString argv0);
-    void connect_hub_sucess_handle(const TArray< TSharedPtr<FJsonValue> >& _event){
-		FString argv0 = nullptr;
-		if ( !(_event[0])->TryGetString(argv0) ){
-			return;
-		}
-        connect_hub_sucess(argv0);
+    boost::signals2::signal<void(std::string) > sig_connect_hub_sucess;
+    void connect_hub_sucess(std::shared_ptr<std::vector<boost::any> > _event){
+        sig_connect_hub_sucess(
+            boost::any_cast<std::string>((*_event)[0]));
     }
 
-    virtual void call_client(FString argv0, FString argv1, TArray< TSharedPtr<FJsonValue> >* argv2);
-    void call_client_handle(const TArray< TSharedPtr<FJsonValue> >& _event){
-		FString argv0 = nullptr;
-		if ( !(_event[0])->TryGetString(argv0) ){
-			return;
-		}
-		FString argv1 = nullptr;
-		if ( !(_event[1])->TryGetString(argv1) ){
-			return;
-		}
-		TArray< TSharedPtr<FJsonValue> >* argv2 = nullptr;
-		if ( !(_event[2])->TryGetArray(argv2) ){
-			return;
-		}
-        call_client(argv0, argv1, argv2);
+    boost::signals2::signal<void() > sig_ack_heartbeats;
+    void ack_heartbeats(std::shared_ptr<std::vector<boost::any> > _event){
+        sig_ack_heartbeats();
+    }
+
+    boost::signals2::signal<void(std::string, std::string, std::shared_ptr<std::vector<boost::any> >) > sig_call_client;
+    void call_client(std::shared_ptr<std::vector<boost::any> > _event){
+        sig_call_client(
+            boost::any_cast<std::string>((*_event)[0]), 
+            boost::any_cast<std::string>((*_event)[1]), 
+            boost::any_cast<std::shared_ptr<std::vector<boost::any> >>((*_event)[2]));
     }
 
 };

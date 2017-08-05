@@ -2,37 +2,50 @@
 #ifndef _channel_h
 #define _channel_h
 
-#include "Json.h"
-#include "Sockets.h"
+#include <queue>
+
+#include <boost/asio.hpp>
+#include <boost/any.hpp>
+
+#include "JsonParse.h"
+#include "Ichannel.h"
 
 namespace service
 {
 
-class channel {
+class channel : public juggle::Ichannel {
 public:
-	channel(TSharedPtr<FSocket> _s)
+	channel(std::shared_ptr<boost::asio::ip::tcp::socket> _s)
 	{
 		s = _s;
 
-		buff_size = 1024 * 1024 * 16;
+		buff_size = 1024 * 1024;
 		buff_offset = 0;
-		buff = new uint8[buff_size];
+		buff = new char[buff_size];
+		
+		s->async_receive(boost::asio::buffer(read_buff, 1024 * 1024), std::bind(&channel::onRecv, this, std::placeholders::_1, std::placeholders::_2));
 	}
 
-	void recv(const uint8 * data, int32 size)
+private:
+	void onRecv(const boost::system::error_code& error, std::size_t bytes_transferred)
+	{
+		recv(read_buff, bytes_transferred);
+	}
+
+	void recv(const char * data, int32_t size)
 	{
 		if ( (buff_offset + size) > buff_size)
 		{
 			buff_size *= 2;
-			auto new_buff = new uint8[buff_size];
+			auto new_buff = new char[buff_size];
 			memcpy(new_buff, buff, buff_offset);
 			delete buff;
 			buff = new_buff;
 		}
 		memcpy(buff + buff_offset, data, size);
 
-		int32 tmp_buff_len = buff_offset + size;
-		int32 tmp_buff_offset = 0;
+		int32_t tmp_buff_len = buff_offset + size;
+		int32_t tmp_buff_offset = 0;
 		while (tmp_buff_len > (tmp_buff_offset + 4))
 		{
 			auto tmp_buff = buff + tmp_buff_offset;
@@ -40,12 +53,9 @@ public:
 
 			if ( (len + tmp_buff_offset + 4) <= tmp_buff_len )
 			{
-				auto reader = TJsonReaderFactory<TCHAR>::Create(FString((char*)(&tmp_buff[4])));
-				TArray< TSharedPtr<FJsonValue> > OutArray;
-				if (FJsonSerializer::Deserialize(reader, OutArray))
-				{
-					que.Enqueue(OutArray);
-				}
+				Fossilizid::JsonParse::JsonObject obj;
+				Fossilizid::JsonParse::unpacker(obj, std::string(&tmp_buff[4], len));
+				que.push(boost::any_cast<Fossilizid::JsonParse::JsonArray>(obj));
 
 				tmp_buff_offset += len + 4;
 			}
@@ -65,40 +75,37 @@ public:
 		}
 	}
 
-	bool pop(TArray< TSharedPtr<FJsonValue> > & OutArray)
+public:
+	bool pop(std::shared_ptr<std::vector<boost::any> >  & out)
 	{
-		return que.Dequeue(OutArray);
+		if (que.empty())
+		{
+			return false;
+		}
+
+		out = que.front();
+		que.pop();
+
+		return true;
 	}
 
-	void push(const TArray< TSharedPtr<FJsonValue> >& InArray)
+	void push(std::shared_ptr<std::vector<boost::any> > in)
 	{
-		FString OutputString;
-		auto write = TJsonWriterFactory<TCHAR>::Create(&OutputString);
-		if (FJsonSerializer::Serialize(InArray, write))
-		{
-			char * buff = TCHAR_TO_ANSI(*OutputString);
-			int len = strlen(buff) + 1;
+		auto data = Fossilizid::JsonParse::pack(in);
 
-			int send_len = 0;
-			while (send_len < len)
-			{
-				int tmp = 0;
-				if (s->Send(&buff[send_len], len - send_len, tmp))
-				{
-					send_len += tmp;
-				}
-			}
-		}
+		s->async_send(boost::asio::buffer(data), [](const boost::system::error_code& error, std::size_t bytes_transferred){});
 	}
 
 private:
-	TQueue< TArray< TSharedPtr<FJsonValue> > > que;
+	std::queue< std::shared_ptr<std::vector<boost::any> > > que;
 
-	TSharedPtr<FSocket> s;
+	std::shared_ptr<boost::asio::ip::tcp::socket> s;
 
-	uint8 * buff;
-	int32 buff_size;
-	int32 buff_offset;
+	char read_buff[1024 * 1024];
+
+	char * buff;
+	int32_t buff_size;
+	int32_t buff_offset;
 
 };
 

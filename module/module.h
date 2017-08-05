@@ -2,31 +2,35 @@
 #ifndef _module_h
 #define _module_h
 
-#include "Json.h"
-#include "Map.h"
+#include <string>
+#include <memory>
+#include <vector>
+#include <map>
+#include <functional>
+
+#include <boost/any.hpp>
 
 namespace common
 {
 
 class imodule {
-public:
-	void reg_cb(FString cb_name, callback cb)
+protected:
+	std::map<std::string, std::function< void( std::shared_ptr<std::vector<boost::any> > ) > > cbs;
+
+	void reg_cb(std::string cb_name, std::function< void( std::shared_ptr<std::vector<boost::any> > ) > cb)
 	{
-		cbs.Add(cb_name, cb);
+		cbs.insert(std::make_pair(cb_name, cb));
 	}
 
-	void invoke(FString cb_name, const TArray< TSharedPtr<FJsonValue> > & InArray)
+public:
+	void invoke(std::string cb_name, std::shared_ptr<std::vector<boost::any> > InArray)
 	{
-		auto cb = cbs.Find(cb_name);
-		if (cb != nullptr)
+		auto cb = cbs.find(cb_name);
+		if (cb != cbs.end())
 		{
-			cb(InArray);
+			(cb->second)(InArray);
 		}
 	}
-
-private:
-	typedef void(*callback)(const TArray< TSharedPtr<FJsonValue> > & InArray);
-	TMap<FString, callback> cbs;
 
 };
 

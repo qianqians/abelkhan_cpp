@@ -1,8 +1,10 @@
 /*this module file is codegen by juggle for c++*/
 #ifndef _gate_call_client_fast_module_h
 #define _gate_call_client_fast_module_h
-
 #include "Imodule.h"
+#include <memory>
+#include <boost/signals2.hpp>
+#include <string>
 
 namespace module
 {
@@ -10,33 +12,24 @@ class gate_call_client_fast : public juggle::Imodule {
 public:
     gate_call_client_fast(){
         module_name = "gate_call_client_fast";
-        protcolcall_set.Add("confirm_refresh_udp_end_point_handle", &gate_call_client_fast::confirm_refresh_udp_end_point_handle);
-        protcolcall_set.Add("call_client_handle", &gate_call_client_fast::call_client_handle);
+        protcolcall_set.insert(std::make_pair("confirm_refresh_udp_end_point", std::bind(&gate_call_client_fast::confirm_refresh_udp_end_point, this, std::placeholders::_1)));
+        protcolcall_set.insert(std::make_pair("call_client", std::bind(&gate_call_client_fast::call_client, this, std::placeholders::_1)));
     }
 
     ~gate_call_client_fast(){
     }
 
-    virtual void confirm_refresh_udp_end_point();
-    void confirm_refresh_udp_end_point_handle(const TArray< TSharedPtr<FJsonValue> >& _event){
-        confirm_refresh_udp_end_point();
+    boost::signals2::signal<void() > sig_confirm_refresh_udp_end_point;
+    void confirm_refresh_udp_end_point(std::shared_ptr<std::vector<boost::any> > _event){
+        sig_confirm_refresh_udp_end_point();
     }
 
-    virtual void call_client(FString argv0, FString argv1, TArray< TSharedPtr<FJsonValue> >* argv2);
-    void call_client_handle(const TArray< TSharedPtr<FJsonValue> >& _event){
-		FString argv0 = nullptr;
-		if ( !(_event[0])->TryGetString(argv0) ){
-			return;
-		}
-		FString argv1 = nullptr;
-		if ( !(_event[1])->TryGetString(argv1) ){
-			return;
-		}
-		TArray< TSharedPtr<FJsonValue> >* argv2 = nullptr;
-		if ( !(_event[2])->TryGetArray(argv2) ){
-			return;
-		}
-        call_client(argv0, argv1, argv2);
+    boost::signals2::signal<void(std::string, std::string, std::shared_ptr<std::vector<boost::any> >) > sig_call_client;
+    void call_client(std::shared_ptr<std::vector<boost::any> > _event){
+        sig_call_client(
+            boost::any_cast<std::string>((*_event)[0]), 
+            boost::any_cast<std::string>((*_event)[1]), 
+            boost::any_cast<std::shared_ptr<std::vector<boost::any> >>((*_event)[2]));
     }
 
 };
