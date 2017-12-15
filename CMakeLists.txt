@@ -26,10 +26,10 @@ INCLUDE_DIRECTORIES(${juggle_header__PATH})
 AUX_SOURCE_DIRECTORY(./tools/juggle/c++/ juggle_DIR_SRC)
 file(GLOB juggle_header_files ./tools/juggle/c++/ ./tools/juggle/c++/*.h)
 
-set(jsonparse_header__PATH ${PROJECT_SOURCE_DIR}//tools//jsonparse CACHE PATH "jsonparse include path")
+set(jsonparse_header__PATH ${PROJECT_SOURCE_DIR}//tools//jsonparsepp CACHE PATH "jsonparse include path")
 INCLUDE_DIRECTORIES(${jsonparse_header__PATH})
 
-file(GLOB jsonparse_header_files ./tools/jsonparse/ ./tools/jsonparse/*.h)
+file(GLOB jsonparse_header_files ./tools/jsonparse/ ./tools/jsonparsepp/*.h)
 
 set(service_header__PATH ${PROJECT_SOURCE_DIR}//service CACHE PATH "service include path")
 INCLUDE_DIRECTORIES(${service_header__PATH})
