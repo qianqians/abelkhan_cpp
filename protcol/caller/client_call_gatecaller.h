@@ -38,6 +38,22 @@ public:
         ch->push(v);
     }
 
+    void enable_heartbeats(){
+        auto v = std::make_shared<std::vector<boost::any> >();
+        v->push_back("client_call_gate");
+        v->push_back("enable_heartbeats");
+        v->push_back(std::make_shared<std::vector<boost::any> >());
+        ch->push(v);
+    }
+
+    void disable_heartbeats(){
+        auto v = std::make_shared<std::vector<boost::any> >();
+        v->push_back("client_call_gate");
+        v->push_back("disable_heartbeats");
+        v->push_back(std::make_shared<std::vector<boost::any> >());
+        ch->push(v);
+    }
+
     void connect_hub(std::string argv0,std::string argv1){
         auto v = std::make_shared<std::vector<boost::any> >();
         v->push_back("client_call_gate");
