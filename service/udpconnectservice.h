@@ -4,6 +4,8 @@
 
 #include <map>
 
+#include <process_.h>
+
 #include "udpchannel.h"
 
 namespace service
@@ -22,19 +24,19 @@ public:
 
 		auto ch = std::make_shared<udpchannel>(s, ip, port);
 		auto data = std::make_shared<ch_data>();
-		memset(data->buff, 0, 1024*1024);
+		memset(data->buff, 0, 16*1024);
 		data->ch = ch;
 		ch_map.insert(std::make_pair(s, data));
 		_process->reg_channel(ch);
 
-		s->async_receive_from(boost::asio::buffer(data->buff, 1024*1024), data->ep, std::bind(&udpconnectservice::onRecv, this, s, std::placeholders::_1, std::placeholders::_2));
+		s->async_receive_from(boost::asio::buffer(data->buff, 16*1024), data->ep, boost::bind(&udpconnectservice::onRecv, this, s, _1, _2));
 
 		return ch;
 	}
 
 	void poll()
 	{
-		_service.run_one();
+		_service.poll_one();
 	}
 
 private:
@@ -42,18 +44,17 @@ private:
 	{
 		auto data = ch_map[s];
 		auto ch = data->ch;
-		if (boost::asio::ip::address::from_string(ch->ip) == data->ep.address() &&
-			ch->port == data->ep.port())
-		{
+		if (boost::asio::ip::address::from_string(ch->ip) == data->ep.address() && ch->port == data->ep.port()){
 			ch->recv(data->buff, bytes_transferred);
 		}
+		s->async_receive_from(boost::asio::buffer(data->buff, 16*1024), data->ep, boost::bind(&udpconnectservice::onRecv, this, s, _1, _2));
 	}
 
 
 private:
 	struct ch_data
 	{
-		char buff[1024 * 1024];
+		char buff[16*1024];
 		boost::asio::ip::udp::endpoint ep;
 		std::shared_ptr<udpchannel> ch;
 	};

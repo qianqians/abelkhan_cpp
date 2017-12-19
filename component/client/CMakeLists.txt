@@ -18,7 +18,7 @@ set(juggle_header__PATH ..//..//tools//juggle//c++ CACHE PATH "juggle include pa
 INCLUDE_DIRECTORIES(${juggle_header__PATH})
 
 AUX_SOURCE_DIRECTORY(../../tools/juggle/c++/ juggle_DIR_SRC)
-file(GLOB juggle_header_files ../../tools/juggle/c++/ ./tools/juggle/c++/*.h)
+file(GLOB juggle_header_files ../../tools/juggle/c++/ ../../tools/juggle/c++/*.h)
 
 set(jsonparse_header__PATH ..//..//tools//jsonparsepp CACHE PATH "jsonparse include path")
 INCLUDE_DIRECTORIES(${jsonparse_header__PATH})

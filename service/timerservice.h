@@ -18,6 +18,7 @@ private:
 public:
 	void addticktimer(int64_t _tick, std::function< void(int64_t) > cb)
 	{
+		_tick += Tick;
 		while (cbs.find(_tick) != cbs.end())
 		{
 			_tick++;

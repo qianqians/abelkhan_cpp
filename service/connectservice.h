@@ -28,7 +28,7 @@ public:
 
 	void poll()
 	{
-		_service.run_one();
+		_service.poll_one();
 	}
 
 private:

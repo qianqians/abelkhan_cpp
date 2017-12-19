@@ -18,12 +18,17 @@ set(juggle_header__PATH ..//..//tools//juggle//c++ CACHE PATH "juggle include pa
 INCLUDE_DIRECTORIES(${juggle_header__PATH})
 
 AUX_SOURCE_DIRECTORY(../../tools/juggle/c++/ juggle_DIR_SRC)
-file(GLOB juggle_header_files ../../tools/juggle/c++/ ./tools/juggle/c++/*.h)
+file(GLOB juggle_header_files ../../tools/juggle/c++/ ../../tools/juggle/c++/*.h)
 
 set(jsonparse_header__PATH ..//..//tools//jsonparsepp CACHE PATH "jsonparse include path")
 INCLUDE_DIRECTORIES(${jsonparse_header__PATH})
 
 file(GLOB jsonparse_header_files ../../tools/jsonparse/ ../../tools/jsonparsepp/*.h)
+
+set(config_header__PATH ..//..//config CACHE PATH "config include path")
+INCLUDE_DIRECTORIES(${config_header__PATH})
+
+file(GLOB config_header_files ../../config/ ../../config/*.h)
 
 set(service_header__PATH ..//..//service CACHE PATH "service include path")
 INCLUDE_DIRECTORIES(${service_header__PATH})
@@ -46,6 +51,7 @@ SET(header_files
     ${caller_header_files}
     ${module_header_files1}
     ${jsonparse_header_files}
+    ${config_header_files}
 )
 
 SET(SRC_LIST 
@@ -53,4 +59,4 @@ SET(SRC_LIST
     ${juggle_DIR_SRC}
 )
 
-ADD_LIBRARY(gate ${SRC_LIST} ${header_files})
+ADD_EXECUTABLE(gate ${SRC_LIST} ${header_files})

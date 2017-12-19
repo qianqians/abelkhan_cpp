@@ -1,134 +1,141 @@
 /*
- *  qianqians
- *  2014-10-5
+ * qianqians
+ * 2016-7-5
+ * gate.cpp
  */
-
-#include "client.h"
-
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/thread.hpp>
 
-namespace client
-{
+#include <acceptservice.h>
+#include <udpacceptservice.h>
+#include <connectservice.h>
+#include <process_.h>
+#include <Ichannel.h>
+#include <Imodule.h>
+#include <channel.h>
+#include <juggleservice.h>
+#include <timerservice.h>
 
-client::client()
-{
-	boost::uuids::random_generator g;
-	auto _uuid = g();
-	uuid = boost::lexical_cast<std::string>(_uuid);
+#include <config.h>
 
-	_heartbeats = 0;
+#include <hub_call_gatemodule.h>
+#include <client_call_gatemodule.h>
+#include <client_call_gate_fastmodule.h>
+#include <center_call_servermodule.h>
 
-	_gate_call_client = std::make_shared<module::gate_call_client>();
-	_gate_call_client->sig_connect_gate_sucess.connect(std::bind(&client::on_ack_connect_gate, this));
-	_gate_call_client->sig_connect_hub_sucess.connect(std::bind(&client::on_ack_connect_hub, this, std::placeholders::_1));
-	_gate_call_client->sig_call_client.connect(std::bind(&client::on_call_client, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-	_gate_call_client->sig_ack_heartbeats.connect(std::bind(&client::on_ack_heartbeats, this));
-	auto tcp_process = std::make_shared<juggle::process>();
-	tcp_process->reg_module(_gate_call_client);
-	_tcp_conn = std::make_shared<service::connectservice>(tcp_process);
+#include "centerproxy.h"
+#include "closehandle.h"
+#include "clientmanager.h"
+#include "hubsvrmanager.h"
+#include "timer_handle.h"
+#include "center_msg_handle.h"
+#include "hub_svr_msg_handle.h"
+#include "client_msg_handle.h"
 
-	_gate_call_client_fast = std::make_shared<module::gate_call_client_fast>();
-	_gate_call_client_fast->sig_confirm_refresh_udp_end_point.connect(std::bind(&client::on_confirm_refresh_udp_end_point, this));
-	_gate_call_client_fast->sig_call_client.connect(std::bind(&client::on_call_client, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-	auto udp_process = std::make_shared<juggle::process>();
-	udp_process->reg_module(_gate_call_client_fast);
-	_udp_conn = std::make_shared<service::udpconnectservice>(udp_process);
-
-	_juggleservice.add_process(tcp_process);
-	_juggleservice.add_process(udp_process);
-}
-
-bool client::connect_server(std::string tcp_ip, short tcp_port, std::string udp_ip, short udp_port, int64_t tick)
-{
-	auto ch = _tcp_conn->connect(tcp_ip, tcp_port);
-	_client_call_gate = std::make_shared<caller::client_call_gate>(ch);
-	_client_call_gate->connect_server(uuid, tick);
-
-	_udp_ip = udp_ip;
-	_udp_port = udp_port;
-
-	return true;
-}
-
-void client::connect_hub(std::string hub_name)
-{
-	_client_call_gate->connect_hub(uuid, hub_name);
-}
-
-void client::call_hub(std::string hub_name, std::string module_name, std::string func_name, std::shared_ptr<std::vector<boost::any> > _argvs)
-{
-	_client_call_gate->forward_client_call_hub(hub_name, module_name, func_name, _argvs);
-}
-
-int64_t client::poll()
-{
-	auto tick = timer.poll();
-
-	_tcp_conn->poll();
-	_udp_conn->poll();
+void main(int argc, char * argv[]) {
+	auto svr_uuid = boost::lexical_cast<std::string>(boost::uuids::random_generator()());
 	
-	_juggleservice.poll();
-
-	return tick;
-}
-
-void client::heartbeats(int64_t tick)
-{
-	if (_heartbeats < tick - 35 * 1000)
-	{
-		sigDisconnect();
+	if (argc <= 1) {
+		std::cout << "non input start argv" << std::endl;
+		return;
 	}
-	else
-	{
-		_client_call_gate->heartbeats(tick);
 
-		timer.addticktimer(tick + 30 * 1000, std::bind(&client::heartbeats, this, std::placeholders::_1));
+	std::string config_file_path = argv[1];
+	auto _config = std::make_shared<config::config>(config_file_path);
+	auto _center_config = _config->get_value_dict("center");
+	if (argc >= 3) {
+		_config = _config->get_value_dict(argv[2]);
 	}
-}
 
-void client::refresh_udp_link(int64_t tick)
-{
-	_client_call_gate_fast->refresh_udp_end_point();
+	std::shared_ptr<service::timerservice> _timerservice = std::make_shared<service::timerservice>();
 
-	timer.addticktimer(tick + 10 * 1000, std::bind(&client::refresh_udp_link, this, std::placeholders::_1));
-}
+	std::shared_ptr<juggle::process> _center_process = std::make_shared<juggle::process>();
+	auto _connectnetworkservice = std::make_shared<service::connectservice>(_center_process);
+	auto center_ip = _center_config->get_value_string("ip");
+	auto center_port = (short)_center_config->get_value_int("port");
+	auto _center_ch = _connectnetworkservice->connect(center_ip, center_port);
+	auto _centerproxy = std::make_shared<gate::centerproxy>(_center_ch);
+	auto inside_ip = _config->get_value_string("inside_ip");
+	auto inside_port = (short)_config->get_value_int("inside_port");
+	_centerproxy->reg_server(inside_ip, inside_port, svr_uuid);
 
-void client::on_ack_heartbeats()
-{
-	_heartbeats = timer.Tick;
-}
+	std::shared_ptr<gate::closehandle> _closehandle = std::make_shared<gate::closehandle>();
+	auto _center_call_server = std::make_shared<module::center_call_server>();
+	_center_call_server->sig_reg_server_sucess.connect(std::bind(&reg_server_sucess, _centerproxy));
+	_center_call_server->sig_close_server.connect(std::bind(&close_server, _closehandle));
+	_center_process->reg_module(_center_call_server);
 
-void client::on_ack_connect_gate()
-{
-	auto udp_ch = _udp_conn->connect(_udp_ip, _udp_port);
-	_client_call_gate_fast = std::make_shared<caller::client_call_gate_fast>(udp_ch);
-	_client_call_gate_fast->refresh_udp_end_point();
+	auto _hub_process = std::make_shared<juggle::process>();
+	auto _hub_call_gate = std::make_shared<module::hub_call_gate>();
+	auto _hubsvrmanager = std::make_shared<gate::hubsvrmanager>();
+	auto _clientmanager = std::make_shared<gate::clientmanager>(_hubsvrmanager);
+	_hub_call_gate->sig_reg_hub.connect(boost::bind(&reg_hub, _hubsvrmanager, _1, _2));
+	_hub_call_gate->sig_connect_sucess.connect(boost::bind(&connect_sucess, _clientmanager, _hubsvrmanager, _1));
+	_hub_call_gate->sig_disconnect_client.connect(boost::bind(&disconnect_client, _clientmanager, _1));
+	_hub_call_gate->sig_forward_hub_call_client.connect(boost::bind(&forward_hub_call_client, _clientmanager, _1, _2, _3, _4));
+	_hub_call_gate->sig_forward_hub_call_group_client.connect(boost::bind(&forward_hub_call_group_client, _clientmanager, _1, _2, _3, _4));
+	_hub_call_gate->sig_forward_hub_call_global_client.connect(boost::bind(&forward_hub_call_global_client, _clientmanager, _1, _2, _3));
+	_hub_call_gate->sig_forward_hub_call_client_fast.connect(boost::bind(&forward_hub_call_client_fast, _clientmanager, _1, _2, _3, _4));
+	_hub_call_gate->sig_forward_hub_call_group_client_fast.connect(boost::bind(&forward_hub_call_group_client_fast, _clientmanager, _1, _2, _3, _4));
+	_hub_process->reg_module(_hub_call_gate);
+	auto _hub_service = std::make_shared<service::acceptservice>(inside_ip, inside_port, _hub_process);
 
-	_heartbeats = timer.Tick;
-	_client_call_gate->heartbeats(timer.Tick);
+	auto _client_process = std::make_shared<juggle::process>();
+	auto _client_call_gate = std::make_shared<module::client_call_gate>();
+	_client_call_gate->sig_connect_server.connect(boost::bind(&connect_server, _clientmanager, _timerservice, _1, _2));
+	_client_call_gate->sig_cancle_server.connect(boost::bind(&cancle_server, _clientmanager));
+	_client_call_gate->sig_connect_hub.connect(boost::bind(&connect_hub, _hubsvrmanager, _1, _2));
+	_client_call_gate->sig_disconnect_hub.connect(boost::bind(&disconnect_hub, _hubsvrmanager, _1, _2));
+	_client_call_gate->sig_enable_heartbeats.connect(boost::bind(&enable_heartbeats, _clientmanager));
+	_client_call_gate->sig_disable_heartbeats.connect(boost::bind(&disable_heartbeats, _clientmanager));
+	_client_call_gate->sig_heartbeats.connect(boost::bind(&heartbeats, _clientmanager, _timerservice, _1));
+	_client_call_gate->sig_forward_client_call_hub.connect(boost::bind(&forward_client_call_hub, _clientmanager, _hubsvrmanager, _1, _2, _3, _4));
+	_client_process->reg_module(_client_call_gate);
+	auto outside_ip = _config->get_value_string("outside_ip");
+	auto outside_port = (short)_config->get_value_int("outside_port");
+	auto _client_service = std::make_shared<service::acceptservice>(outside_ip, outside_port, _client_process);
 
-	timer.addticktimer(timer.Tick + 30 * 1000, std::bind(&client::heartbeats, this, std::placeholders::_1));
-	timer.addticktimer(timer.Tick + 10 * 1000, std::bind(&client::refresh_udp_link, this, std::placeholders::_1));
+	auto _udpchs = std::make_shared<gate::udpchannelmanager>(_timerservice);
+	auto _udp_client_process = std::make_shared<juggle::process>();
+	auto _client_call_gate_fast = std::make_shared<module::client_call_gate_fast>();
+	_client_call_gate_fast->sig_refresh_udp_end_point.connect(boost::bind(&refresh_udp_end_point, _udpchs));
+	_client_call_gate_fast->sig_confirm_create_udp_link.connect(boost::bind(&confirm_create_udp_link, _udpchs, _clientmanager, _1));
+	auto udp_outside_ip = _config->get_value_string("udp_outside_ip");
+	auto udp_outside_port = (short)_config->get_value_int("udp_outside_port");
+	auto _udp_client_service = std::make_shared<service::udpacceptservice>(udp_outside_ip, udp_outside_port, _udp_client_process);
 
-	sigConnectGate();
-}
+	std::shared_ptr<service::juggleservice> _juggleservice = std::make_shared<service::juggleservice>();
+	_juggleservice->add_process(_center_process);
+	_juggleservice->add_process(_hub_process);
+	_juggleservice->add_process(_client_process);
+	_juggleservice->add_process(_udp_client_process);
 
-void client::on_ack_connect_hub(std::string _hub_name)
-{
-	sigConnectHub(_hub_name);
-}
+	_timerservice->addticktimer(5 * 1000, std::bind(&heartbeat_handle, _clientmanager, _timerservice, std::placeholders::_1));
+	_timerservice->addticktimer(10 * 1000, std::bind(&tick_udpchannel_handle, _udpchs, _timerservice, std::placeholders::_1));
 
-void client::on_call_client(std::string module_name, std::string func_name, std::shared_ptr<std::vector<boost::any> > _argvs)
-{
-	modules.process_module_mothed(module_name, func_name, _argvs);
-}
+	while (true){
+		try {
+			_connectnetworkservice->poll();
 
-void client::on_confirm_refresh_udp_end_point()
-{
-	_client_call_gate_fast->confirm_create_udp_link(uuid);
-}
+			if (_centerproxy->is_reg_sucess) {
+				_hub_service->poll();
+				_client_service->poll();
+				_udp_client_service->poll();
+				_timerservice->poll();
+			}
 
+			_juggleservice->poll();
+		}
+		catch(std::exception e) {
+			std::cout << e.what() << std::endl;
+		}
+
+		if (_closehandle->is_closed) {
+			std::cout << "server closed, gate server " << svr_uuid << std::endl;
+			break;
+		}
+	}
 }
