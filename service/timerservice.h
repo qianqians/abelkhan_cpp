@@ -16,6 +16,11 @@ private:
 	std::map<int64_t, std::function< void(int64_t) > > cbs;
 
 public:
+	timerservice() 
+	{
+		Tick = time(nullptr) * 1000;
+	}
+
 	void addticktimer(int64_t _tick, std::function< void(int64_t) > cb)
 	{
 		_tick += Tick;
@@ -29,7 +34,7 @@ public:
 
 	int64_t poll()
 	{
-		Tick = time(nullptr);
+		Tick = time(nullptr) * 1000;
 
 		std::vector<int64_t> remove;
 		for (auto it = cbs.begin(); it != cbs.end(); it++)

@@ -31,7 +31,12 @@ public:
 		buffer << fs.rdbuf();
 		std::string buff(buffer.str());
 
-		Fossilizid::JsonParse::unpacker(handle, buff);
+		try{ 
+			Fossilizid::JsonParse::unpacker(handle, buff);
+		}
+		catch (Fossilizid::JsonParse::jsonformatexception e) {
+			std::cout << buff << std::endl;
+		}
 	}
 	
 	~config() {

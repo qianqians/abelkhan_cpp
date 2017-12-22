@@ -20,6 +20,8 @@ void connect_server(std::shared_ptr<gate::clientmanager> _clientmanager, std::sh
 		return;
 	}
 
+	std::cout << "client connect " << uuid << std::endl;
+
 	_clientmanager->reg_client(uuid, juggle::current_ch, _timerservice->Tick, clienttick);
 	auto _client_proxy = std::make_shared<caller::gate_call_client>(juggle::current_ch);
 	_client_proxy->connect_gate_sucess();
@@ -79,6 +81,9 @@ void forward_client_call_hub(std::shared_ptr<gate::clientmanager> _clientmanager
 void heartbeats(std::shared_ptr<gate::clientmanager> _clientmanager, std::shared_ptr<service::timerservice> _timerservice, std::int64_t clienttick) {
 	if (_clientmanager->has_client(juggle::current_ch)) {
 		_clientmanager->refresh_and_check_client(juggle::current_ch, _timerservice->Tick, clienttick);
+
+		auto _caller = std::make_shared<caller::gate_call_client>(juggle::current_ch);
+		_caller->ack_heartbeats();
 	}
 }
 

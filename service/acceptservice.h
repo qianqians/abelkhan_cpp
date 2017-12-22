@@ -17,7 +17,9 @@ public:
 	acceptservice(std::string ip, short port, std::shared_ptr<juggle::process> process) : _acceptor(_service){
 		_process = process;
 
-		_acceptor.bind(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(ip), port));
+		boost::asio::ip::tcp::endpoint ep(boost::asio::ip::address::from_string(ip), port);
+		_acceptor.open(ep.protocol());
+		_acceptor.bind(ep);
 		_acceptor.listen();
 
 		auto s = std::make_shared<boost::asio::ip::tcp::socket>(_service);
@@ -55,7 +57,7 @@ public:
 	}
 
 	void poll(){
-		_service.poll_one();
+		_service.poll();
 	}
 
 private:

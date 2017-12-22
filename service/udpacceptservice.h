@@ -17,13 +17,15 @@ public:
 		_process = process;
 
 		listen = std::make_shared<boost::asio::ip::udp::socket>(_service);
-		listen->bind(boost::asio::ip::udp::endpoint(boost::asio::ip::address::from_string(ip), port));
+		boost::asio::ip::udp::endpoint ep(boost::asio::ip::address::from_string(ip), port);
+		listen->open(ep.protocol());
+		listen->bind(ep);
 		memset(buff, 0, 16*1024);
 		listen->async_receive_from(boost::asio::buffer(buff, 16*1024), sender, boost::bind(&udpacceptservice::onRecv, this, _1, _2));
 	}
 
 	void poll(){
-		_service.poll_one();
+		_service.poll();
 	}
 
 private:

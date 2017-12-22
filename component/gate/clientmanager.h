@@ -75,6 +75,9 @@ public:
 
 	void refresh_and_check_client(std::shared_ptr<juggle::Ichannel> _client, int64_t servertick, int64_t clienttick) {
 		if (((clienttick - client_time[_client]) - (servertick - client_server_time[_client])) > 10 * 1000) {
+			std::cout << "clienttick_new:" << clienttick << " clienttick_old:" << client_time[_client] << std::endl;
+			std::cout << "servertick_new:" << servertick << " servertick_old:" << client_server_time[_client] << std::endl;
+
 			auto client_uuid = client_uuid_map[_client];
 			_hubsvrmanager->for_each_hub([client_uuid](std::string hub_name, std::shared_ptr<juggle::Ichannel> hub_ch) {
 				auto _caller = std::make_shared<caller::gate_call_hub>(hub_ch);

@@ -2,7 +2,7 @@
 #ifndef _channel_h
 #define _channel_h
 
-#include <queue>
+#include <list>
 
 #include <boost/asio.hpp>
 #include <boost/any.hpp>
@@ -21,11 +21,11 @@ public:
 	{
 		s = _s;
 
-		buff_size = 1024 * 1024;
+		buff_size = 16 * 1024;
 		buff_offset = 0;
 		buff = new char[buff_size];
 		
-		s->async_receive(boost::asio::buffer(read_buff, 1024 * 1024), boost::bind(&channel::onRecv, this, _1, _2));
+		s->async_receive(boost::asio::buffer(read_buff, 16 * 1024), boost::bind(&channel::onRecv, this, _1, _2));
 	}
 
 	boost::signals2::signal<void(std::shared_ptr<channel>)> sigondisconn;
@@ -59,20 +59,35 @@ private:
 			}
 			memcpy(buff + buff_offset, data, size);
 
+			std::cout << "buff_offset:" << buff_offset << std::endl;
+
 			int32_t tmp_buff_len = buff_offset + size;
 			int32_t tmp_buff_offset = 0;
 			while (tmp_buff_len > (tmp_buff_offset + 4))
 			{
-				auto tmp_buff = buff + tmp_buff_offset;
-				int len = (int)tmp_buff[0] | ((int)tmp_buff[1] << 8) | ((int)tmp_buff[2] << 16) | ((int)tmp_buff[3] << 24);
+				auto tmp_buff = (unsigned char *)buff + tmp_buff_offset;
+				uint32_t len = (uint32_t)tmp_buff[0] | ((uint32_t)tmp_buff[1] << 8) | ((uint32_t)tmp_buff[2] << 16) | ((uint32_t)tmp_buff[3] << 24);
+
+				std::cout << "tmp_buff_offset:" << tmp_buff_offset << " tmp_buff_len:" << tmp_buff_len << " len:" << len << std::endl;
 
 				if ((len + tmp_buff_offset + 4) <= tmp_buff_len)
 				{
-					Fossilizid::JsonParse::JsonObject obj;
-					Fossilizid::JsonParse::unpacker(obj, std::string(&tmp_buff[4], len));
-					que.push(boost::any_cast<Fossilizid::JsonParse::JsonArray>(obj));
+					//std::cout << "read:" << &tmp_buff[4] << std::endl;
+					//std::string json_str(&tmp_buff[4], len);
+					std::string json_str((char*)(&tmp_buff[4]));
+					//std::cout << "read:" << json_str << std::endl;
+					try
+					{
+						Fossilizid::JsonParse::JsonObject obj;
+						Fossilizid::JsonParse::unpacker(obj, json_str);
+						que.push_back(boost::any_cast<Fossilizid::JsonParse::JsonArray>(obj));
 
-					tmp_buff_offset += len + 4;
+						tmp_buff_offset += len + 4;
+					}
+					catch (Fossilizid::JsonParse::jsonformatexception e)
+					{
+						std::cout << "error:" << json_str << std::endl;
+					}
 				}
 				else
 				{
@@ -89,10 +104,12 @@ private:
 				tmp_buff_offset = tmp_buff_len;
 			}
 
-			s->async_receive(boost::asio::buffer(read_buff, 1024 * 1024), boost::bind(&channel::onRecv, this, _1, _2));
+			memset(read_buff, 0, 16 * 1024);
+			s->async_receive(boost::asio::buffer(read_buff, 16 * 1024), boost::bind(&channel::onRecv, this, _1, _2));
 		}
-		catch (...) {
-			sigondisconn(shared_from_this());
+		catch (std::exception e) {
+			std::cout << "error:" << e.what() << std::endl;
+			disconnect();
 		}
 	}
 
@@ -110,7 +127,7 @@ public:
 		}
 
 		out = que.front();
-		que.pop();
+		que.pop_front();
 
 		return true;
 	}
@@ -119,6 +136,9 @@ public:
 	{
 		try {
 			auto data = Fossilizid::JsonParse::pack(in);
+
+			std::cout << "send:" << data << std::endl;
+
 			size_t len = data.size();
 			char * _data = new char[len + 4];
 			_data[0] = len & 0xff;
@@ -135,17 +155,18 @@ public:
 
 			delete[] _data;
 		}
-		catch (...) {
+		catch (std::exception e) {
+			std::cout << "error:" << e.what() << std::endl;
 			sigondisconn(shared_from_this());
 		}
 	}
 
 private:
-	std::queue< std::shared_ptr<std::vector<boost::any> > > que;
+	std::list< std::shared_ptr<std::vector<boost::any> > > que;
 
 	std::shared_ptr<boost::asio::ip::tcp::socket> s;
 
-	char read_buff[1024 * 1024];
+	char read_buff[16 * 1024];
 
 	char * buff;
 	int32_t buff_size;

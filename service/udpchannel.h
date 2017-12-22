@@ -2,7 +2,7 @@
 #ifndef _udpchannel_h
 #define _udpchannel_h
 
-#include <queue>
+#include <list>
 
 #include <boost/asio.hpp>
 #include <boost/any.hpp>
@@ -50,7 +50,7 @@ public:
 				if ((len + tmp_buff_offset + 4) <= tmp_buff_len) {
 					Fossilizid::JsonParse::JsonObject obj;
 					Fossilizid::JsonParse::unpacker(obj, std::string(&tmp_buff[4], len));
-					que.push(boost::any_cast<Fossilizid::JsonParse::JsonArray>(obj));
+					que.push_back(boost::any_cast<Fossilizid::JsonParse::JsonArray>(obj));
 
 					tmp_buff_offset += len + 4;
 				}
@@ -82,7 +82,7 @@ public:
 		}
 
 		out = que.front();
-		que.pop();
+		que.pop_front();
 
 		return true;
 	}
@@ -117,7 +117,7 @@ public:
 	short port;
 
 private:
-	std::queue< std::shared_ptr<std::vector<boost::any> > > que;
+	std::list< std::shared_ptr<std::vector<boost::any> > > que;
 
 	std::shared_ptr<boost::asio::ip::udp::socket> s;
 

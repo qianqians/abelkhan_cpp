@@ -52,22 +52,8 @@ void main(int argc, char * argv[]) {
 
 	std::shared_ptr<service::timerservice> _timerservice = std::make_shared<service::timerservice>();
 
-	std::shared_ptr<juggle::process> _center_process = std::make_shared<juggle::process>();
-	auto _connectnetworkservice = std::make_shared<service::connectservice>(_center_process);
-	auto center_ip = _center_config->get_value_string("ip");
-	auto center_port = (short)_center_config->get_value_int("port");
-	auto _center_ch = _connectnetworkservice->connect(center_ip, center_port);
-	auto _centerproxy = std::make_shared<gate::centerproxy>(_center_ch);
 	auto inside_ip = _config->get_value_string("inside_ip");
 	auto inside_port = (short)_config->get_value_int("inside_port");
-	_centerproxy->reg_server(inside_ip, inside_port, svr_uuid);
-
-	std::shared_ptr<gate::closehandle> _closehandle = std::make_shared<gate::closehandle>();
-	auto _center_call_server = std::make_shared<module::center_call_server>();
-	_center_call_server->sig_reg_server_sucess.connect(std::bind(&reg_server_sucess, _centerproxy));
-	_center_call_server->sig_close_server.connect(std::bind(&close_server, _closehandle));
-	_center_process->reg_module(_center_call_server);
-
 	auto _hub_process = std::make_shared<juggle::process>();
 	auto _hub_call_gate = std::make_shared<module::hub_call_gate>();
 	auto _hubsvrmanager = std::make_shared<gate::hubsvrmanager>();
@@ -103,9 +89,23 @@ void main(int argc, char * argv[]) {
 	auto _client_call_gate_fast = std::make_shared<module::client_call_gate_fast>();
 	_client_call_gate_fast->sig_refresh_udp_end_point.connect(boost::bind(&refresh_udp_end_point, _udpchs));
 	_client_call_gate_fast->sig_confirm_create_udp_link.connect(boost::bind(&confirm_create_udp_link, _udpchs, _clientmanager, _1));
+	_udp_client_process->reg_module(_client_call_gate_fast);
 	auto udp_outside_ip = _config->get_value_string("udp_outside_ip");
 	auto udp_outside_port = (short)_config->get_value_int("udp_outside_port");
 	auto _udp_client_service = std::make_shared<service::udpacceptservice>(udp_outside_ip, udp_outside_port, _udp_client_process);
+
+	std::shared_ptr<juggle::process> _center_process = std::make_shared<juggle::process>();
+	auto _connectnetworkservice = std::make_shared<service::connectservice>(_center_process);
+	auto center_ip = _center_config->get_value_string("ip");
+	auto center_port = (short)_center_config->get_value_int("port");
+	auto _center_ch = _connectnetworkservice->connect(center_ip, center_port);
+	auto _centerproxy = std::make_shared<gate::centerproxy>(_center_ch);
+	std::shared_ptr<gate::closehandle> _closehandle = std::make_shared<gate::closehandle>();
+	auto _center_call_server = std::make_shared<module::center_call_server>();
+	_center_call_server->sig_reg_server_sucess.connect(std::bind(&reg_server_sucess, _centerproxy));
+	_center_call_server->sig_close_server.connect(std::bind(&close_server, _closehandle));
+	_center_process->reg_module(_center_call_server);
+	_centerproxy->reg_server(inside_ip, inside_port, svr_uuid);
 
 	std::shared_ptr<service::juggleservice> _juggleservice = std::make_shared<service::juggleservice>();
 	_juggleservice->add_process(_center_process);
@@ -120,12 +120,10 @@ void main(int argc, char * argv[]) {
 		try {
 			_connectnetworkservice->poll();
 
-			if (_centerproxy->is_reg_sucess) {
-				_hub_service->poll();
-				_client_service->poll();
-				_udp_client_service->poll();
-				_timerservice->poll();
-			}
+			_hub_service->poll();
+			_client_service->poll();
+			_udp_client_service->poll();
+			_timerservice->poll();
 
 			_juggleservice->poll();
 		}
@@ -137,5 +135,7 @@ void main(int argc, char * argv[]) {
 			std::cout << "server closed, gate server " << svr_uuid << std::endl;
 			break;
 		}
+
+		boost::this_thread::sleep(boost::get_system_time() + boost::posix_time::microseconds(15));
 	}
 }
