@@ -59,8 +59,6 @@ private:
 			}
 			memcpy(buff + buff_offset, data, size);
 
-			std::cout << "buff_offset:" << buff_offset << std::endl;
-
 			int32_t tmp_buff_len = buff_offset + size;
 			int32_t tmp_buff_offset = 0;
 			while (tmp_buff_len > (tmp_buff_offset + 4))
@@ -68,14 +66,10 @@ private:
 				auto tmp_buff = (unsigned char *)buff + tmp_buff_offset;
 				uint32_t len = (uint32_t)tmp_buff[0] | ((uint32_t)tmp_buff[1] << 8) | ((uint32_t)tmp_buff[2] << 16) | ((uint32_t)tmp_buff[3] << 24);
 
-				std::cout << "tmp_buff_offset:" << tmp_buff_offset << " tmp_buff_len:" << tmp_buff_len << " len:" << len << std::endl;
-
 				if ((len + tmp_buff_offset + 4) <= tmp_buff_len)
 				{
-					//std::cout << "read:" << &tmp_buff[4] << std::endl;
-					//std::string json_str(&tmp_buff[4], len);
 					std::string json_str((char*)(&tmp_buff[4]));
-					//std::cout << "read:" << json_str << std::endl;
+					std::cout << "read:" << json_str << std::endl;
 					try
 					{
 						Fossilizid::JsonParse::JsonObject obj;
@@ -113,10 +107,15 @@ private:
 		}
 	}
 
+	void onClose() {
+		s->cancel();
+		s->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+		s->close();
+	}
+
 public:
 	void disconnect() {
-		s->close();
-		sigdisconn(shared_from_this());
+		s->get_io_service().post(std::bind(&channel::onClose, this));
 	}
 
 	bool pop(std::shared_ptr<std::vector<boost::any> >  & out)
@@ -134,10 +133,14 @@ public:
 
 	void push(std::shared_ptr<std::vector<boost::any> > in)
 	{
+		if (!s->is_open()){
+			return;
+		}
+
 		try {
 			auto data = Fossilizid::JsonParse::pack(in);
 
-			std::cout << "send:" << data << std::endl;
+			//std::cout << "send:" << data << std::endl;
 
 			size_t len = data.size();
 			char * _data = new char[len + 4];

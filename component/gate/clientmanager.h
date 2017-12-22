@@ -102,10 +102,25 @@ public:
 		}
 
 		auto _client_uuid = client_uuid_map[_client];
-		client_map.erase(_client_uuid);
-		client_server_time.erase(_client);
-		client_time.erase(_client);
-		client_uuid_map.erase(_client);
+		if (client_map.find(_client_uuid) != client_map.end())
+		{
+			client_map.erase(_client_uuid);
+		}
+		if (client_server_time.find(_client) != client_server_time.end())
+		{
+			client_server_time.erase(_client);
+		}
+		if (client_time.find(_client) != client_time.end())
+		{
+			client_time.erase(_client);
+		}
+		if (client_uuid_map.find(_client) != client_uuid_map.end())
+		{
+			client_uuid_map.erase(_client);
+		}
+		if (heartbeats_client.find(_client) != heartbeats_client.end()) {
+			heartbeats_client.erase(_client);
+		}
 	}
 
 	void reg_client_udp(std::string uuid, std::shared_ptr<juggle::Ichannel> _client) {

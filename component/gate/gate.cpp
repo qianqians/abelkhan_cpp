@@ -83,6 +83,9 @@ void main(int argc, char * argv[]) {
 	auto outside_ip = _config->get_value_string("outside_ip");
 	auto outside_port = (short)_config->get_value_int("outside_port");
 	auto _client_service = std::make_shared<service::acceptservice>(outside_ip, outside_port, _client_process);
+	_client_service->sigchanneldisconnect.connect([_clientmanager](std::shared_ptr<juggle::Ichannel> ch) {
+		_clientmanager->unreg_client(ch);
+	});
 
 	auto _udpchs = std::make_shared<gate::udpchannelmanager>(_timerservice);
 	auto _udp_client_process = std::make_shared<juggle::process>();
@@ -119,13 +122,13 @@ void main(int argc, char * argv[]) {
 	while (true){
 		try {
 			_connectnetworkservice->poll();
-
 			_hub_service->poll();
 			_client_service->poll();
 			_udp_client_service->poll();
-			_timerservice->poll();
 
 			_juggleservice->poll();
+
+			_timerservice->poll();
 		}
 		catch(std::exception e) {
 			std::cout << e.what() << std::endl;
