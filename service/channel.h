@@ -69,7 +69,6 @@ private:
 				if ((len + tmp_buff_offset + 4) <= tmp_buff_len)
 				{
 					std::string json_str((char*)(&tmp_buff[4]));
-					std::cout << "read:" << json_str << std::endl;
 					try
 					{
 						Fossilizid::JsonParse::JsonObject obj;
@@ -139,8 +138,6 @@ public:
 
 		try {
 			auto data = Fossilizid::JsonParse::pack(in);
-
-			//std::cout << "send:" << data << std::endl;
 
 			size_t len = data.size();
 			char * _data = new char[len + 4];

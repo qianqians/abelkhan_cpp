@@ -44,12 +44,12 @@ public:
 			int32_t tmp_buff_len = buff_offset + size;
 			int32_t tmp_buff_offset = 0;
 			while (tmp_buff_len > (tmp_buff_offset + 4)) {
-				auto tmp_buff = buff + tmp_buff_offset;
-				int len = (int)tmp_buff[0] | ((int)tmp_buff[1] << 8) | ((int)tmp_buff[2] << 16) | ((int)tmp_buff[3] << 24);
+				auto tmp_buff = (unsigned char *)buff + tmp_buff_offset;
+				uint32_t len = (uint32_t)tmp_buff[0] | ((uint32_t)tmp_buff[1] << 8) | ((uint32_t)tmp_buff[2] << 16) | ((uint32_t)tmp_buff[3] << 24);
 
 				if ((len + tmp_buff_offset + 4) <= tmp_buff_len) {
 					Fossilizid::JsonParse::JsonObject obj;
-					Fossilizid::JsonParse::unpacker(obj, std::string(&tmp_buff[4], len));
+					Fossilizid::JsonParse::unpacker(obj, std::string((char*)(&tmp_buff[4]), len));
 					que.push_back(boost::any_cast<Fossilizid::JsonParse::JsonArray>(obj));
 
 					tmp_buff_offset += len + 4;

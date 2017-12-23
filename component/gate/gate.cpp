@@ -120,6 +120,7 @@ void main(int argc, char * argv[]) {
 	_timerservice->addticktimer(10 * 1000, std::bind(&tick_udpchannel_handle, _udpchs, _timerservice, std::placeholders::_1));
 
 	while (true){
+		clock_t begin = clock();
 		try {
 			_connectnetworkservice->poll();
 			_hub_service->poll();
@@ -136,9 +137,12 @@ void main(int argc, char * argv[]) {
 
 		if (_closehandle->is_closed) {
 			std::cout << "server closed, gate server " << svr_uuid << std::endl;
-			break;
+			return;
 		}
-
-		boost::this_thread::sleep(boost::get_system_time() + boost::posix_time::microseconds(15));
+		
+		clock_t tick = clock() - begin;
+		if (tick < 200){
+			boost::this_thread::sleep(boost::get_system_time() + boost::posix_time::microseconds(15));
+		}
 	}
 }
