@@ -137,7 +137,7 @@ void main(int argc, char * argv[]) {
 
 		if (_closehandle->is_closed) {
 			std::cout << "server closed, gate server " << svr_uuid << std::endl;
-			return;
+			exit(0);
 		}
 		
 		clock_t tick = clock() - begin;
