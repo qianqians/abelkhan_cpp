@@ -68,7 +68,7 @@ private:
 
 				if ((len + tmp_buff_offset + 4) <= tmp_buff_len)
 				{
-					std::string json_str((char*)(&tmp_buff[4]));
+					std::string json_str((char*)(&tmp_buff[4]), len);
 					try
 					{
 						Fossilizid::JsonParse::JsonObject obj;

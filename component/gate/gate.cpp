@@ -141,8 +141,8 @@ void main(int argc, char * argv[]) {
 		}
 		
 		clock_t tick = clock() - begin;
-		if (tick < 200){
-			boost::this_thread::sleep(boost::get_system_time() + boost::posix_time::microseconds(15));
+		if (tick < 50){
+			boost::this_thread::sleep(boost::get_system_time() + boost::posix_time::microseconds(5));
 		}
 	}
 }
