@@ -24,8 +24,10 @@ public:
 		buff_size = 16 * 1024;
 		buff_offset = 0;
 		buff = new char[buff_size];
+		memset(buff, 0, buff_size);
 		
-		s->async_receive(boost::asio::buffer(read_buff, 16 * 1024), boost::bind(&channel::onRecv, this, _1, _2));
+		memset(read_buff, 0, 16 * 1024);
+		s->async_read_some(boost::asio::buffer(read_buff, 16 * 1024), boost::bind(&channel::onRecv, this, _1, _2));
 	}
 
 	boost::signals2::signal<void(std::shared_ptr<channel>)> sigondisconn;
@@ -43,23 +45,25 @@ private:
 			return;
 		}
 
-		recv(read_buff, bytes_transferred);
+		if ((buff_offset + bytes_transferred) > buff_size)
+		{
+			buff_size *= 2;
+			auto new_buff = new char[buff_size];
+			memset(new_buff, 0, buff_size);
+			memcpy(new_buff, buff, buff_offset);
+			delete[] buff;
+			buff = new_buff;
+		}
+		memcpy(buff + buff_offset, read_buff, bytes_transferred);
+		buff_offset += bytes_transferred;
+
+		recv();
 	}
 
-	void recv(const char * data, int32_t size)
+	void recv()
 	{
 		try{
-			if ((buff_offset + size) > buff_size)
-			{
-				buff_size *= 2;
-				auto new_buff = new char[buff_size];
-				memcpy(new_buff, buff, buff_offset);
-				delete buff;
-				buff = new_buff;
-			}
-			memcpy(buff + buff_offset, data, size);
-
-			int32_t tmp_buff_len = buff_offset + size;
+			int32_t tmp_buff_len = buff_offset;
 			int32_t tmp_buff_offset = 0;
 			while (tmp_buff_len > (tmp_buff_offset + 4))
 			{
@@ -80,25 +84,29 @@ private:
 					catch (Fossilizid::JsonParse::jsonformatexception e)
 					{
 						std::cout << "error:" << json_str << std::endl;
+						disconnect();
+
+						return;
 					}
 				}
 				else
 				{
-					memcpy(buff, &buff[tmp_buff_offset], tmp_buff_len - tmp_buff_offset);
-					buff_offset = tmp_buff_len - tmp_buff_offset;
-					tmp_buff_offset = tmp_buff_len;
+					break;
 				}
 			}
 
+			buff_offset = tmp_buff_len - tmp_buff_offset;
 			if (tmp_buff_len > tmp_buff_offset)
 			{
-				memcpy(buff, &buff[tmp_buff_offset], tmp_buff_len - tmp_buff_offset);
-				buff_offset = tmp_buff_len - tmp_buff_offset;
-				tmp_buff_offset = tmp_buff_len;
+				auto new_buff = new char[buff_size];
+				memset(new_buff, 0, buff_size);
+				memcpy(new_buff, &buff[tmp_buff_offset], buff_offset);
+				delete[] buff;
+				buff = new_buff;
 			}
 
 			memset(read_buff, 0, 16 * 1024);
-			s->async_receive(boost::asio::buffer(read_buff, 16 * 1024), boost::bind(&channel::onRecv, this, _1, _2));
+			s->async_read_some(boost::asio::buffer(read_buff, 16 * 1024), boost::bind(&channel::onRecv, this, _1, _2));
 		}
 		catch (std::exception e) {
 			std::cout << "error:" << e.what() << std::endl;
@@ -140,7 +148,7 @@ public:
 			auto data = Fossilizid::JsonParse::pack(in);
 
 			size_t len = data.size();
-			char * _data = new char[len + 4];
+			unsigned char * _data = new unsigned char[len + 4];
 			_data[0] = len & 0xff;
 			_data[1] = len >> 8 & 0xff;
 			_data[2] = len >> 16 & 0xff;
@@ -148,9 +156,10 @@ public:
 			memcpy_s(&_data[4], len, data.c_str(), data.size());
 			size_t datasize = len + 4;
 
-			auto offset = s->send(boost::asio::buffer(_data, datasize));
+			size_t offset = 0;
 			while (offset < datasize) {
-				offset += s->send(boost::asio::buffer(&_data[len], datasize - offset));
+				auto tmp_len = s->send(boost::asio::buffer(&_data[offset], datasize - offset));
+				offset += tmp_len;
 			}
 
 			delete[] _data;
