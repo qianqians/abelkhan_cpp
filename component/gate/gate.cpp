@@ -96,6 +96,12 @@ void main(int argc, char * argv[]) {
 	auto udp_outside_ip = _config->get_value_string("udp_outside_ip");
 	auto udp_outside_port = (short)_config->get_value_int("udp_outside_port");
 	auto _udp_client_service = std::make_shared<service::udpacceptservice>(udp_outside_ip, udp_outside_port, _udp_client_process);
+	_udp_client_service->sigchannelconnect.connect([_udpchs](std::shared_ptr<juggle::Ichannel> ch) {
+		_udpchs->add_udpchannel(ch);
+	});
+	_udp_client_service->sigchanneldisconnect.connect([_clientmanager](std::shared_ptr<juggle::Ichannel> ch) {
+		_clientmanager->unreg_client_udp(ch);
+	});
 
 	std::shared_ptr<juggle::process> _center_process = std::make_shared<juggle::process>();
 	auto _connectnetworkservice = std::make_shared<service::connectservice>(_center_process);
@@ -140,8 +146,7 @@ void main(int argc, char * argv[]) {
 			exit(0);
 		}
 		
-		clock_t tick = clock() - begin;
-		if (tick < 50){
+		if ((clock() - begin) < 50){
 			boost::this_thread::sleep(boost::get_system_time() + boost::posix_time::microseconds(5));
 		}
 	}

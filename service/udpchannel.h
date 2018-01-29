@@ -26,6 +26,10 @@ public:
 		buff_offset = 0;
 		buff = new char[buff_size];
 	}
+
+	~udpchannel(){
+		delete[] buff;
+	}
 	
 	boost::signals2::signal<void(std::shared_ptr<udpchannel>)> sigondisconn;
 	boost::signals2::signal<void(std::shared_ptr<udpchannel>)> sigdisconn;
@@ -48,23 +52,27 @@ public:
 				uint32_t len = (uint32_t)tmp_buff[0] | ((uint32_t)tmp_buff[1] << 8) | ((uint32_t)tmp_buff[2] << 16) | ((uint32_t)tmp_buff[3] << 24);
 
 				if ((len + tmp_buff_offset + 4) <= tmp_buff_len) {
+					std::string json_str((char*)(&tmp_buff[4]), len);
+					std::cout << "udp recv:" << json_str << std::endl;
+
 					Fossilizid::JsonParse::JsonObject obj;
-					Fossilizid::JsonParse::unpacker(obj, std::string((char*)(&tmp_buff[4]), len));
+					Fossilizid::JsonParse::unpacker(obj, json_str);
 					que.push_back(boost::any_cast<Fossilizid::JsonParse::JsonArray>(obj));
 
 					tmp_buff_offset += len + 4;
 				}
 				else {
-					memcpy(buff, &buff[tmp_buff_offset], tmp_buff_len - tmp_buff_offset);
-					buff_offset = tmp_buff_len - tmp_buff_offset;
-					tmp_buff_offset = tmp_buff_len;
+					break;
 				}
 			}
 
+			buff_offset = tmp_buff_len - tmp_buff_offset;
 			if (tmp_buff_len > tmp_buff_offset) {
-				memcpy(buff, &buff[tmp_buff_offset], tmp_buff_len - tmp_buff_offset);
-				buff_offset = tmp_buff_len - tmp_buff_offset;
-				tmp_buff_offset = tmp_buff_len;
+				auto new_buff = new char[buff_size];
+				memset(new_buff, 0, buff_size);
+				memcpy(new_buff, &buff[tmp_buff_offset], buff_offset);
+				delete[] buff;
+				buff = new_buff;
 			}
 		}
 		catch (...) {

@@ -102,6 +102,8 @@ public:
 		}
 
 		auto _client_uuid = client_uuid_map[_client];
+		std::cout << "unreg_client:" << _client_uuid << std::endl;
+
 		if (client_map.find(_client_uuid) != client_map.end())
 		{
 			client_map.erase(_client_uuid);
@@ -125,6 +127,19 @@ public:
 
 	void reg_client_udp(std::string uuid, std::shared_ptr<juggle::Ichannel> _client) {
 		client_udp_ch_map.insert(std::make_pair(uuid, _client));
+		client_udp_uuid_map.insert(std::make_pair(_client, uuid));
+	}
+
+	void unreg_client_udp(std::shared_ptr<juggle::Ichannel> _client){
+		if (client_udp_uuid_map.find(_client) == client_udp_uuid_map.end()) {
+			return;
+		}
+
+		auto uuid = client_udp_uuid_map[_client];
+		std::cout << "unreg_client_udp:" << uuid << std::endl;
+
+		client_udp_ch_map.erase(uuid);
+		client_udp_uuid_map.erase(_client);
 	}
 
 	bool has_client(std::shared_ptr<juggle::Ichannel> _client) {
@@ -163,6 +178,7 @@ private:
 	std::map<std::shared_ptr<juggle::Ichannel>, int64_t > client_time;
 
 	std::map<std::string, std::shared_ptr<juggle::Ichannel> > client_udp_ch_map;
+	std::map<std::shared_ptr<juggle::Ichannel>, std::string> client_udp_uuid_map;
 
 	std::shared_ptr<hubsvrmanager> _hubsvrmanager;
 

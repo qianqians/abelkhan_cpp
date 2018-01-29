@@ -28,7 +28,6 @@ public:
 		_service.poll();
 	}
 
-private:
 	boost::signals2::signal<void(std::shared_ptr<juggle::Ichannel>)> sigchannelconnect;
 	void onRecv(const boost::system::error_code& error, std::size_t bytes_transferred){
 		if (error) {
@@ -50,7 +49,7 @@ private:
 			ch = std::make_shared<udpchannel>(listen, sender.address().to_string(), sender.port());
 			udps.push_back(std::make_pair(sender, ch));
 			ch->sigondisconn.connect(boost::bind(&udpacceptservice::onChannelDisconn, this, _1));
-			ch->sigdisconn.connect(boost::bind(&udpacceptservice::ChannelDisconn, this, _1));
+			ch->sigdisconn.connect(boost::bind(&udpacceptservice::onChannelDisconn, this, _1));
 
 			sigchannelconnect(ch);
 			_process->reg_channel(ch);
@@ -68,10 +67,12 @@ private:
 			sigchanneldisconnect(ch);
 		}
 
-		_process->unreg_channel(ch);
-	}
+		for (auto it = udps.begin(); it != udps.end(); it++){
+			if (it->second == ch) {
+				udps.erase(it);
+			}
+		}
 
-	void ChannelDisconn(std::shared_ptr<udpchannel> ch) {
 		_process->unreg_channel(ch);
 	}
 

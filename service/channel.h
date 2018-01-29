@@ -30,6 +30,10 @@ public:
 		s->async_read_some(boost::asio::buffer(read_buff, 16 * 1024), boost::bind(&channel::onRecv, this, _1, _2));
 	}
 
+	~channel(){
+		delete[] buff;
+	}
+
 	boost::signals2::signal<void(std::shared_ptr<channel>)> sigondisconn;
 	boost::signals2::signal<void(std::shared_ptr<channel>)> sigdisconn;
 
