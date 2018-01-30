@@ -29,6 +29,8 @@ public:
 
 	~udpchannel(){
 		delete[] buff;
+
+		std::cout << "~udpchannel" << std::endl;
 	}
 	
 	boost::signals2::signal<void(std::shared_ptr<udpchannel>)> sigondisconn;

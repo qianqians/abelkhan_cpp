@@ -70,6 +70,7 @@ public:
 		for (auto it = udps.begin(); it != udps.end(); it++){
 			if (it->second == ch) {
 				udps.erase(it);
+				break;
 			}
 		}
 

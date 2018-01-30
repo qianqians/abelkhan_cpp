@@ -138,8 +138,14 @@ public:
 		auto uuid = client_udp_uuid_map[_client];
 		std::cout << "unreg_client_udp:" << uuid << std::endl;
 
-		client_udp_ch_map.erase(uuid);
-		client_udp_uuid_map.erase(_client);
+		if (client_udp_ch_map.find(uuid) != client_udp_ch_map.end())
+		{
+			client_udp_ch_map.erase(uuid);
+		}
+		if (client_udp_uuid_map.find(_client) != client_udp_uuid_map.end())
+		{
+			client_udp_uuid_map.erase(_client);
+		}
 	}
 
 	bool has_client(std::shared_ptr<juggle::Ichannel> _client) {

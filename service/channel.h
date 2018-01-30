@@ -32,6 +32,8 @@ public:
 
 	~channel(){
 		delete[] buff;
+
+		std::cout << "~channel" << std::endl;
 	}
 
 	boost::signals2::signal<void(std::shared_ptr<channel>)> sigondisconn;
