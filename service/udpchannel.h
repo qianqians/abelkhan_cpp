@@ -29,8 +29,6 @@ public:
 
 	~udpchannel(){
 		delete[] buff;
-
-		std::cout << "~udpchannel" << std::endl;
 	}
 	
 	boost::signals2::signal<void(std::shared_ptr<udpchannel>)> sigondisconn;
@@ -55,7 +53,6 @@ public:
 
 				if ((len + tmp_buff_offset + 4) <= tmp_buff_len) {
 					std::string json_str((char*)(&tmp_buff[4]), len);
-					std::cout << "udp recv:" << json_str << std::endl;
 
 					Fossilizid::JsonParse::JsonObject obj;
 					Fossilizid::JsonParse::unpacker(obj, json_str);
