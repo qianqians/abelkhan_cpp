@@ -40,7 +40,7 @@ public:
 				buff_size *= 2;
 				auto new_buff = new char[buff_size];
 				memcpy(new_buff, buff, buff_offset);
-				delete buff;
+				delete[] buff;
 				buff = new_buff;
 			}
 			memcpy(buff + buff_offset, data, size);
