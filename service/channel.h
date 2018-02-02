@@ -119,9 +119,15 @@ private:
 	}
 
 	void onClose() {
-		s->cancel();
-		s->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-		s->close();
+		try
+		{
+			s->cancel();
+			s->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+			s->close();
+		}
+		catch (std::exception e) {
+			std::cout << "error:" << e.what() << std::endl;
+		}
 	}
 
 public:
