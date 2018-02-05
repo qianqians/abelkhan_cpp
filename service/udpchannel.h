@@ -8,6 +8,7 @@
 #include <boost/any.hpp>
 #include <boost/bind.hpp>
 #include <boost/signals2.hpp>
+#include <boost/thread.hpp>
 
 #include "JsonParse.h"
 #include "Ichannel.h"
@@ -107,14 +108,28 @@ public:
 			size_t datasize = len + 4;
 
 			boost::asio::ip::udp::endpoint ep(boost::asio::ip::address::from_string(ip), port);
-			auto offset = s->send_to(boost::asio::buffer(_data, datasize), ep);
+			size_t offset = 0;
 			while (offset < datasize) {
-				offset += s->send_to(boost::asio::buffer(&_data[len], datasize - offset), ep);
+				try {
+					offset += s->send_to(boost::asio::buffer(&_data[len], datasize - offset), ep);
+				}
+				catch (boost::system::system_error e) {
+					if (e.code() == boost::asio::error::would_block) {
+						boost::this_thread::sleep(boost::get_system_time() + boost::posix_time::microseconds(1));
+						continue;
+					}
+					else {
+						std::cout << "error:" << e.what() << std::endl;
+						sigondisconn(shared_from_this());
+						break;
+					}
+				}
 			}
 
 			delete[] _data;
 		}
-		catch (...) {
+		catch (std::exception e) {
+			std::cout << "error:" << e.what() << std::endl;
 			sigondisconn(shared_from_this());
 		}
 	}
