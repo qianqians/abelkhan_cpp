@@ -25,9 +25,14 @@ public:
 		buff_offset = 0;
 		buff = new char[buff_size];
 		memset(buff, 0, buff_size);
-		
+
+		is_close = false;
+	}
+
+	void start()
+	{
 		memset(read_buff, 0, 16 * 1024);
-		s->async_read_some(boost::asio::buffer(read_buff, 16 * 1024), boost::bind(&channel::onRecv, this, _1, _2));
+		s->async_read_some(boost::asio::buffer(read_buff, 16 * 1024), boost::bind(&channel::onRecv, shared_from_this(), _1, _2));
 	}
 
 	~channel(){
@@ -38,30 +43,34 @@ public:
 	boost::signals2::signal<void(std::shared_ptr<channel>)> sigdisconn;
 
 private:
-	void onRecv(const boost::system::error_code& error, std::size_t bytes_transferred){
+	static void onRecv(std::shared_ptr<channel> ch, const boost::system::error_code& error, std::size_t bytes_transferred){
+		if (ch->is_close) {
+			return;
+		}
+
 		if (error){
-			sigondisconn(shared_from_this());
+			ch->sigondisconn(ch);
 			return;
 		}
 
 		if (bytes_transferred == 0){
-			sigondisconn(shared_from_this());
+			ch->sigondisconn(ch);
 			return;
 		}
 
-		if ((buff_offset + bytes_transferred) > buff_size)
+		if ((ch->buff_offset + bytes_transferred) > ch->buff_size)
 		{
-			buff_size *= 2;
-			auto new_buff = new char[buff_size];
-			memset(new_buff, 0, buff_size);
-			memcpy(new_buff, buff, buff_offset);
-			delete[] buff;
-			buff = new_buff;
+			ch->buff_size *= 2;
+			auto new_buff = new char[ch->buff_size];
+			memset(new_buff, 0, ch->buff_size);
+			memcpy(new_buff, ch->buff, ch->buff_offset);
+			delete[] ch->buff;
+			ch->buff = new_buff;
 		}
-		memcpy(buff + buff_offset, read_buff, bytes_transferred);
-		buff_offset += bytes_transferred;
+		memcpy(ch->buff + ch->buff_offset, ch->read_buff, bytes_transferred);
+		ch->buff_offset += bytes_transferred;
 
-		recv();
+		ch->recv();
 	}
 
 	void recv()
@@ -110,7 +119,7 @@ private:
 			}
 
 			memset(read_buff, 0, 16 * 1024);
-			s->async_read_some(boost::asio::buffer(read_buff, 16 * 1024), boost::bind(&channel::onRecv, this, _1, _2));
+			s->async_read_some(boost::asio::buffer(read_buff, 16 * 1024), boost::bind(&channel::onRecv, shared_from_this(), _1, _2));
 		}
 		catch (std::exception e) {
 			std::cout << "error:" << e.what() << std::endl;
@@ -118,21 +127,18 @@ private:
 		}
 	}
 
-	void onClose() {
+public:
+	void disconnect() {
+		is_close = true;
+		sigdisconn(shared_from_this());
+
 		try
 		{
-			s->cancel();
-			s->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
 			s->close();
 		}
 		catch (std::exception e) {
 			std::cout << "error:" << e.what() << std::endl;
 		}
-	}
-
-public:
-	void disconnect() {
-		s->get_io_service().post(std::bind(&channel::onClose, this));
 	}
 
 	bool pop(std::shared_ptr<std::vector<boost::any> >  & out)
@@ -150,6 +156,10 @@ public:
 
 	void push(std::shared_ptr<std::vector<boost::any> > in)
 	{
+		if (is_close) {
+			return;
+		}
+
 		if (!s->is_open()){
 			return;
 		}
@@ -190,6 +200,8 @@ private:
 	char * buff;
 	int32_t buff_size;
 	int32_t buff_offset;
+
+	bool is_close;
 
 };
 

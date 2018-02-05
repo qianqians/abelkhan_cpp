@@ -22,6 +22,7 @@ public:
 		auto ch = std::make_shared<channel>(s);
 
 		_process->reg_channel(ch);
+		ch->start();
 
 		return ch;
 	}
