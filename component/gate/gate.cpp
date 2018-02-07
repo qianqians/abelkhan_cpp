@@ -10,7 +10,6 @@
 #include <boost/thread.hpp>
 
 #include <acceptservice.h>
-#include <udpacceptservice.h>
 #include <connectservice.h>
 #include <process_.h>
 #include <Ichannel.h>
@@ -23,7 +22,6 @@
 
 #include <hub_call_gatemodule.h>
 #include <client_call_gatemodule.h>
-#include <client_call_gate_fastmodule.h>
 #include <center_call_servermodule.h>
 
 #include "centerproxy.h"
@@ -64,8 +62,6 @@ void main(int argc, char * argv[]) {
 	_hub_call_gate->sig_forward_hub_call_client.connect(boost::bind(&forward_hub_call_client, _clientmanager, _1, _2, _3, _4));
 	_hub_call_gate->sig_forward_hub_call_group_client.connect(boost::bind(&forward_hub_call_group_client, _clientmanager, _1, _2, _3, _4));
 	_hub_call_gate->sig_forward_hub_call_global_client.connect(boost::bind(&forward_hub_call_global_client, _clientmanager, _1, _2, _3));
-	_hub_call_gate->sig_forward_hub_call_client_fast.connect(boost::bind(&forward_hub_call_client_fast, _clientmanager, _1, _2, _3, _4));
-	_hub_call_gate->sig_forward_hub_call_group_client_fast.connect(boost::bind(&forward_hub_call_group_client_fast, _clientmanager, _1, _2, _3, _4));
 	_hub_process->reg_module(_hub_call_gate);
 	auto _hub_service = std::make_shared<service::acceptservice>(inside_ip, inside_port, _hub_process);
 
@@ -87,22 +83,6 @@ void main(int argc, char * argv[]) {
 		_clientmanager->unreg_client(ch);
 	});
 
-	auto _udpchs = std::make_shared<gate::udpchannelmanager>(_timerservice);
-	auto _udp_client_process = std::make_shared<juggle::process>();
-	auto _client_call_gate_fast = std::make_shared<module::client_call_gate_fast>();
-	_client_call_gate_fast->sig_refresh_udp_end_point.connect(boost::bind(&refresh_udp_end_point, _udpchs));
-	_client_call_gate_fast->sig_confirm_create_udp_link.connect(boost::bind(&confirm_create_udp_link, _udpchs, _clientmanager, _1));
-	_udp_client_process->reg_module(_client_call_gate_fast);
-	auto udp_outside_ip = _config->get_value_string("udp_outside_ip");
-	auto udp_outside_port = (short)_config->get_value_int("udp_outside_port");
-	auto _udp_client_service = std::make_shared<service::udpacceptservice>(udp_outside_ip, udp_outside_port, _udp_client_process);
-	_udp_client_service->sigchannelconnect.connect([_udpchs](std::shared_ptr<juggle::Ichannel> ch) {
-		_udpchs->add_udpchannel(ch);
-	});
-	_udp_client_service->sigchanneldisconnect.connect([_clientmanager](std::shared_ptr<juggle::Ichannel> ch) {
-		_clientmanager->unreg_client_udp(ch);
-	});
-
 	std::shared_ptr<juggle::process> _center_process = std::make_shared<juggle::process>();
 	auto _connectnetworkservice = std::make_shared<service::connectservice>(_center_process);
 	auto center_ip = _center_config->get_value_string("ip");
@@ -120,10 +100,8 @@ void main(int argc, char * argv[]) {
 	_juggleservice->add_process(_center_process);
 	_juggleservice->add_process(_hub_process);
 	_juggleservice->add_process(_client_process);
-	_juggleservice->add_process(_udp_client_process);
 
 	_timerservice->addticktimer(5 * 1000, std::bind(&heartbeat_handle, _clientmanager, _timerservice, std::placeholders::_1));
-	_timerservice->addticktimer(10 * 1000, std::bind(&tick_udpchannel_handle, _udpchs, _timerservice, std::placeholders::_1));
 
 	while (true){
 		clock_t begin = clock();
@@ -131,7 +109,6 @@ void main(int argc, char * argv[]) {
 			_connectnetworkservice->poll();
 			_hub_service->poll();
 			_client_service->poll();
-			_udp_client_service->poll();
 
 			_juggleservice->poll();
 

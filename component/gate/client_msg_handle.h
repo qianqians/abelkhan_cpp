@@ -9,11 +9,9 @@
 
 #include <gate_call_hubcaller.h>
 #include <gate_call_clientcaller.h>
-#include <gate_call_client_fastcaller.h>
 
 #include "hubsvrmanager.h"
 #include "clientmanager.h"
-#include "udpchannelmanager.h"
 
 void connect_server(std::shared_ptr<gate::clientmanager> _clientmanager, std::shared_ptr<service::timerservice> _timerservice, std::string uuid, int64_t clienttick) {
 	if (_clientmanager->has_client(uuid)){
@@ -84,24 +82,6 @@ void heartbeats(std::shared_ptr<gate::clientmanager> _clientmanager, std::shared
 
 		auto _caller = std::make_shared<caller::gate_call_client>(juggle::current_ch);
 		_caller->ack_heartbeats();
-	}
-}
-
-void refresh_udp_end_point(std::shared_ptr<gate::udpchannelmanager> _udpchannelmanager){
-	_udpchannelmanager->refresh_udpchannel(juggle::current_ch);
-
-	auto _caller = std::make_shared<caller::gate_call_client_fast>(juggle::current_ch);
-	_caller->confirm_refresh_udp_end_point();
-}
-
-void confirm_create_udp_link(std::shared_ptr<gate::udpchannelmanager> _udpchannelmanager, std::shared_ptr<gate::clientmanager> _clientmanager, std::string client_uuid){
-	_udpchannelmanager->refresh_udpchannel(juggle::current_ch);
-
-	if (_clientmanager->has_client(client_uuid)){
-		_clientmanager->reg_client_udp(client_uuid, juggle::current_ch);
-	}
-	else{
-		juggle::current_ch->disconnect();
 	}
 }
 

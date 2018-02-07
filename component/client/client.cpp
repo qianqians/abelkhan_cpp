@@ -30,25 +30,14 @@ client::client()
 	tcp_process->reg_module(_gate_call_client);
 	_tcp_conn = std::make_shared<service::connectservice>(tcp_process);
 
-	_gate_call_client_fast = std::make_shared<module::gate_call_client_fast>();
-	_gate_call_client_fast->sig_confirm_refresh_udp_end_point.connect(std::bind(&client::on_confirm_refresh_udp_end_point, this));
-	_gate_call_client_fast->sig_call_client.connect(std::bind(&client::on_call_client, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-	auto udp_process = std::make_shared<juggle::process>();
-	udp_process->reg_module(_gate_call_client_fast);
-	_udp_conn = std::make_shared<service::udpconnectservice>(udp_process);
-
 	_juggleservice.add_process(tcp_process);
-	_juggleservice.add_process(udp_process);
 }
 
-bool client::connect_server(std::string tcp_ip, short tcp_port, std::string udp_ip, short udp_port, int64_t tick)
+bool client::connect_server(std::string tcp_ip, short tcp_port, int64_t tick)
 {
 	auto ch = _tcp_conn->connect(tcp_ip, tcp_port);
 	_client_call_gate = std::make_shared<caller::client_call_gate>(ch);
 	_client_call_gate->connect_server(uuid, tick);
-
-	_udp_ip = udp_ip;
-	_udp_port = udp_port;
 
 	return true;
 }
@@ -68,7 +57,6 @@ int64_t client::poll()
 	auto tick = timer.poll();
 
 	_tcp_conn->poll();
-	_udp_conn->poll();
 	
 	_juggleservice.poll();
 
@@ -89,13 +77,6 @@ void client::heartbeats(int64_t tick)
 	}
 }
 
-void client::refresh_udp_link(int64_t tick)
-{
-	_client_call_gate_fast->refresh_udp_end_point();
-
-	timer.addticktimer(tick + 10 * 1000, std::bind(&client::refresh_udp_link, this, std::placeholders::_1));
-}
-
 void client::on_ack_heartbeats()
 {
 	_heartbeats = timer.Tick;
@@ -103,10 +84,6 @@ void client::on_ack_heartbeats()
 
 void client::on_ack_connect_gate()
 {
-	auto udp_ch = _udp_conn->connect(_udp_ip, _udp_port);
-	_client_call_gate_fast = std::make_shared<caller::client_call_gate_fast>(udp_ch);
-	_client_call_gate_fast->refresh_udp_end_point();
-
 	_heartbeats = timer.Tick;
 	_client_call_gate->heartbeats(timer.Tick);
 
@@ -124,11 +101,6 @@ void client::on_ack_connect_hub(std::string _hub_name)
 void client::on_call_client(std::string module_name, std::string func_name, std::shared_ptr<std::vector<boost::any> > _argvs)
 {
 	modules.process_module_mothed(module_name, func_name, _argvs);
-}
-
-void client::on_confirm_refresh_udp_end_point()
-{
-	_client_call_gate_fast->confirm_create_udp_link(uuid);
 }
 
 }
