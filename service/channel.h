@@ -50,11 +50,13 @@ private:
 		}
 
 		if (error){
+			ch->is_close = true;
 			ch->sigondisconn(ch);
 			return;
 		}
 
 		if (bytes_transferred == 0){
+			ch->is_close = true;
 			ch->sigondisconn(ch);
 			return;
 		}
@@ -189,6 +191,7 @@ public:
 					}
 					else {
 						std::cout << "error:" << e.what() << std::endl;
+						is_close = true;
 						sigondisconn(shared_from_this());
 						break;
 					}
@@ -199,6 +202,7 @@ public:
 		}
 		catch (std::exception e) {
 			std::cout << "error:" << e.what() << std::endl;
+			is_close = true;
 			sigondisconn(shared_from_this());
 		}
 	}
