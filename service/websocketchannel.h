@@ -1,26 +1,27 @@
 
-#ifndef _channel_h
-#define _channel_h
+#ifndef _websocket_channel_h
+#define _websocket_channel_h
 
-#include <list>
-
-#include <boost/asio.hpp>
 #include <boost/any.hpp>
-#include <boost/bind.hpp>
 #include <boost/signals2.hpp>
-#include <boost/thread.hpp>
 
+#include <websocketpp/config/asio_no_tls.hpp>
+#include <websocketpp/connection.hpp>
+#include <websocketpp/server.hpp>
+
+#include "swapque.h"
 #include "JsonParse.h"
 #include "Ichannel.h"
 
 namespace service
 {
 
-class channel : public juggle::Ichannel, public std::enable_shared_from_this<channel> {
+class webchannel : public juggle::Ichannel, public std::enable_shared_from_this<webchannel> {
 public:
-	channel(std::shared_ptr<boost::asio::ip::tcp::socket> _s)
+	webchannel(std::shared_ptr<websocketpp::server<websocketpp::config::asio> > _server, websocketpp::connection_hdl _hdl)
 	{
-		s = _s;
+		server = _server;
+		hdl = _hdl;
 
 		buff_size = 16 * 1024;
 		buff_offset = 0;
@@ -30,55 +31,31 @@ public:
 		is_close = false;
 	}
 
-	void start()
-	{
-		memset(read_buff, 0, 16 * 1024);
-		s->async_read_some(boost::asio::buffer(read_buff, 16 * 1024), boost::bind(&channel::onRecv, shared_from_this(), _1, _2));
-	}
-
-	~channel(){
+	~webchannel() {
 		delete[] buff;
 	}
 
-	boost::signals2::signal<void(std::shared_ptr<channel>)> sigondisconn;
-	boost::signals2::signal<void(std::shared_ptr<channel>)> sigdisconn;
+	boost::signals2::signal<void(std::shared_ptr<webchannel>)> sigdisconn;
 
-private:
-	static void onRecv(std::shared_ptr<channel> ch, const boost::system::error_code& error, std::size_t bytes_transferred){
-		if (ch->is_close) {
-			return;
-		}
-
-		if (error){
-			ch->is_close = true;
-			ch->sigondisconn(ch);
-			return;
-		}
-
-		if (bytes_transferred == 0){
-			ch->is_close = true;
-			ch->sigondisconn(ch);
-			return;
-		}
-
-		while ((ch->buff_offset + bytes_transferred) > ch->buff_size)
-		{
-			ch->buff_size *= 2;
-			auto new_buff = new char[ch->buff_size];
-			memset(new_buff, 0, ch->buff_size);
-			memcpy(new_buff, ch->buff, ch->buff_offset);
-			delete[] ch->buff;
-			ch->buff = new_buff;
-		}
-		memcpy(ch->buff + ch->buff_offset, ch->read_buff, bytes_transferred);
-		ch->buff_offset += bytes_transferred;
-
-		ch->recv();
-	}
-
-	void recv()
+	void recv(std::string resv_data)
 	{
-		try{
+		if (is_close) {
+			return;
+		}
+
+		try {
+			while ((buff_offset + resv_data.size()) > buff_size)
+			{
+				buff_size *= 2;
+				auto new_buff = new char[buff_size];
+				memset(new_buff, 0, buff_size);
+				memcpy(new_buff, buff, buff_offset);
+				delete[] buff;
+				buff = new_buff;
+			}
+			memcpy(buff + buff_offset, resv_data.c_str(), resv_data.size());
+			buff_offset += resv_data.size();
+
 			int32_t tmp_buff_len = buff_offset;
 			int32_t tmp_buff_offset = 0;
 			while (tmp_buff_len > (tmp_buff_offset + 4))
@@ -93,7 +70,7 @@ private:
 					{
 						Fossilizid::JsonParse::JsonObject obj;
 						Fossilizid::JsonParse::unpacker(obj, json_str);
-						que.push_back(boost::any_cast<Fossilizid::JsonParse::JsonArray>(obj));
+						que.push(boost::any_cast<Fossilizid::JsonParse::JsonArray>(obj));
 
 						tmp_buff_offset += len + 4;
 					}
@@ -120,9 +97,6 @@ private:
 				delete[] buff;
 				buff = new_buff;
 			}
-
-			memset(read_buff, 0, 16 * 1024);
-			s->async_read_some(boost::asio::buffer(read_buff, 16 * 1024), boost::bind(&channel::onRecv, shared_from_this(), _1, _2));
 		}
 		catch (std::exception e) {
 			std::cout << "error:" << e.what() << std::endl;
@@ -137,7 +111,6 @@ public:
 
 		try
 		{
-			s->close();
 		}
 		catch (std::exception e) {
 			std::cout << "error:" << e.what() << std::endl;
@@ -151,19 +124,12 @@ public:
 			return false;
 		}
 
-		out = que.front();
-		que.pop_front();
-
-		return true;
+		return que.pop(out);
 	}
 
 	void push(std::shared_ptr<std::vector<boost::any> > in)
 	{
 		if (is_close) {
-			return;
-		}
-
-		if (!s->is_open()){
 			return;
 		}
 
@@ -179,23 +145,7 @@ public:
 			memcpy_s(&_data[4], len, data.c_str(), data.size());
 			size_t datasize = len + 4;
 
-			size_t offset = 0;
-			while (offset < datasize) {
-				try {
-					offset += s->send(boost::asio::buffer(&_data[offset], datasize - offset));
-				}
-				catch (boost::system::system_error e) {
-					if (e.code() == boost::asio::error::would_block) {
-						boost::this_thread::sleep(boost::get_system_time() + boost::posix_time::microseconds(1));
-						continue;
-					}
-					else {
-						std::cout << "error:" << e.what() << std::endl;
-						is_close = true;
-						break;
-					}
-				}
-			}
+			server->send(hdl, _data, datasize, websocketpp::frame::opcode::binary);
 
 			delete[] _data;
 		}
@@ -206,11 +156,10 @@ public:
 	}
 
 private:
-	std::list< std::shared_ptr<std::vector<boost::any> > > que;
+	Fossilizid::container::swapque< std::shared_ptr<std::vector<boost::any> > > que;
 
-	std::shared_ptr<boost::asio::ip::tcp::socket> s;
-
-	char read_buff[16 * 1024];
+	std::shared_ptr<websocketpp::server<websocketpp::config::asio> > server;
+	websocketpp::connection_hdl hdl;
 
 	char * buff;
 	int32_t buff_size;
