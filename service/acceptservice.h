@@ -2,6 +2,9 @@
 #ifndef _acceptservice_h
 #define _acceptservice_h
 
+#include <list>
+#include <functional>
+
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/signals2.hpp>
@@ -51,15 +54,27 @@ public:
 			sigchanneldisconnect(ch);
 		}
 
-		_process->unreg_channel(ch);
+		gc_fn_list.push_back([this, ch]() {
+			_process->unreg_channel(ch);
+		});
 	}
 
 	void ChannelDisconn(std::shared_ptr<channel> ch) {
-		_process->unreg_channel(ch);
+		gc_fn_list.push_back([this, ch]() {
+			_process->unreg_channel(ch);
+		});
 	}
 
 	void poll(){
 		_service.poll();
+	}
+
+	void gc_poll() {
+		for (auto gc_fn : gc_fn_list)
+		{
+			gc_fn();
+		}
+		gc_fn_list.clear();
 	}
 
 private:
@@ -67,6 +82,8 @@ private:
 	boost::asio::ip::tcp::acceptor _acceptor;
 
 	std::shared_ptr<juggle::process> _process;
+
+	std::list<std::function<void()> > gc_fn_list;
 
 };
 

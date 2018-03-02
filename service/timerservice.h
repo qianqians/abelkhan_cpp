@@ -2,11 +2,11 @@
 #ifndef _timerservice_h
 #define _timerservice_h
 
-#include <time.h>
-
 #include <functional>
 #include <map>
 #include <vector>
+
+#include "msec_time.h"
 
 namespace service
 {
@@ -18,7 +18,7 @@ private:
 public:
 	timerservice() 
 	{
-		Tick = time(nullptr) * 1000;
+		Tick = msec_time();
 	}
 
 	void addticktimer(int64_t _tick, std::function< void(int64_t) > cb)
@@ -34,7 +34,7 @@ public:
 
 	int64_t poll()
 	{
-		Tick = time(nullptr) * 1000;
+		Tick = msec_time();
 
 		std::vector<int64_t> remove;
 		for (auto it = cbs.begin(); it != cbs.end(); it++)

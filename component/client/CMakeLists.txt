@@ -14,6 +14,11 @@ INCLUDE_DIRECTORIES(${module_header__PATH})
 
 file(GLOB module_header_files .../../protcol/module/ ../../protcol/module/*.h)
 
+set(time_header__PATH ..//..//time CACHE PATH "time include path")
+INCLUDE_DIRECTORIES(${time_header__PATH})
+
+file(GLOB time_header_files ../../time/ ../../time/*.h)
+
 set(juggle_header__PATH ..//..//tools//juggle//c++ CACHE PATH "juggle include path")
 INCLUDE_DIRECTORIES(${juggle_header__PATH})
 
@@ -46,6 +51,7 @@ SET(header_files
     ${caller_header_files}
     ${module_header_files1}
     ${jsonparse_header_files}
+    ${time_header_files}
 )
 
 SET(SRC_LIST 

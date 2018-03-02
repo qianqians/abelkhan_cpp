@@ -3,9 +3,11 @@
 #define _websocket_acceptservice_h
 
 #include <thread>
+#include <functional>
 
 #include <boost/signals2.hpp>
 
+#include "msque.h"
 #include "websocketchannel.h"
 #include "process_.h"
 
@@ -57,7 +59,9 @@ public:
 			sigchanneldisconnect(ch);
 		}
 
-		_process->unreg_channel(ch);
+		gc_fn_que.push([this, ch]() {
+			_process->unreg_channel(ch);
+		});
 	}
 
 	void onMsg(websocketpp::connection_hdl hdl, websocketpp::server<websocketpp::config::asio>::message_ptr msg)
@@ -72,10 +76,20 @@ public:
 	}
 
 	void ChannelDisconn(std::shared_ptr<webchannel> ch) {
-		_process->unreg_channel(ch);
+		gc_fn_que.push([this, ch]() {
+			_process->unreg_channel(ch);
+		});
 	}
 
 	void poll(){
+	}
+
+	void gc_poll() {
+		std::function<void()> gc_fn;
+		while (gc_fn_que.pop(gc_fn))
+		{
+			gc_fn();
+		}
 	}
 
 private:
@@ -87,6 +101,8 @@ private:
 	std::map<void*, std::shared_ptr<webchannel> > _chs;
 
 	std::thread th;
+
+	Fossilizid::container::msque<std::function<void()> > gc_fn_que;
 
 };
 

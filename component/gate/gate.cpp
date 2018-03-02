@@ -32,6 +32,7 @@
 #include "center_msg_handle.h"
 #include "hub_svr_msg_handle.h"
 #include "client_msg_handle.h"
+#include "gc_poll.h"
 
 void main(int argc, char * argv[]) {
 	auto svr_uuid = boost::lexical_cast<std::string>(boost::uuids::random_generator()());
@@ -80,7 +81,9 @@ void main(int argc, char * argv[]) {
 	auto outside_port = (short)_config->get_value_int("outside_port");
 	auto _client_service = std::make_shared<service::acceptservice>(outside_ip, outside_port, _client_process);
 	_client_service->sigchanneldisconnect.connect([_clientmanager](std::shared_ptr<juggle::Ichannel> ch) {
-		_clientmanager->unreg_client(ch);
+		gate::gc_put([_clientmanager, ch]() {
+			_clientmanager->unreg_client(ch);
+		});
 	});
 
 	std::shared_ptr<juggle::process> _center_process = std::make_shared<juggle::process>();
@@ -113,8 +116,18 @@ void main(int argc, char * argv[]) {
 			_juggleservice->poll();
 
 			_timerservice->poll();
+
 		}
 		catch(std::exception e) {
+			std::cout << e.what() << std::endl;
+		}
+
+		try {
+			_client_service->gc_poll();
+
+			gate::gc_poll();
+		}
+		catch (std::exception e) {
 			std::cout << e.what() << std::endl;
 		}
 

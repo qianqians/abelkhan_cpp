@@ -192,6 +192,7 @@ public:
 					else {
 						std::cout << "error:" << e.what() << std::endl;
 						is_close = true;
+						sigondisconn(shared_from_this());
 						break;
 					}
 				}
@@ -202,6 +203,7 @@ public:
 		catch (std::exception e) {
 			std::cout << "error:" << e.what() << std::endl;
 			is_close = true;
+			sigondisconn(shared_from_this());
 		}
 	}
 
