@@ -24,43 +24,49 @@ void reg_hub(std::shared_ptr<gate::hubsvrmanager> _hubmanager, std::string uuid,
 }
 
 void connect_sucess(std::shared_ptr<gate::clientmanager> _clientmanager, std::shared_ptr<gate::hubsvrmanager> _hubmanager, std::string client_uuid){
-	auto _client_channel = _clientmanager->get_client(client_uuid);
-	if (_client_channel != nullptr){
-		auto _client_caller = std::make_shared<caller::gate_call_client>(_client_channel);
-
-		std::string _hub_name = _hubmanager->get_hub(juggle::current_ch);
-		if (_hub_name != ""){
-			_client_caller->connect_hub_sucess(_hub_name);
-		}
+	if (!_clientmanager->has_client(client_uuid)) {
+		return;
 	}
+
+	std::string _hub_name = _hubmanager->get_hub(juggle::current_ch);
+	if (_hub_name == "") {
+		return;
+	}
+
+	auto _client_channel = _clientmanager->get_client(client_uuid);
+	auto _client_caller = std::make_shared<caller::gate_call_client>(_client_channel);
+	_client_caller->connect_hub_sucess(_hub_name);
 }
 
 void disconnect_client(std::shared_ptr<gate::clientmanager> _clientmanager, std::string client_uuid){
-	auto _client_channel = _clientmanager->get_client(client_uuid);
-	if (_client_channel != nullptr)
-	{
-		_clientmanager->unreg_client(_client_channel);
-		_client_channel->disconnect();
+	if (!_clientmanager->has_client(client_uuid)) {
+		return;
 	}
+
+	auto _client_channel = _clientmanager->get_client(client_uuid);
+	_clientmanager->unreg_client(_client_channel);
+	_client_channel->disconnect();
 }
 
 void forward_hub_call_client(std::shared_ptr<gate::clientmanager> _clientmanager, std::string uuid, std::string module, std::string func, std::shared_ptr<std::vector<boost::any> > argv) {
-	if (_clientmanager->has_client(uuid)) {
-		auto client_channel = _clientmanager->get_client(uuid);
-
-		std::shared_ptr<caller::gate_call_client> _caller = std::make_shared<caller::gate_call_client>(client_channel);
-		_caller->call_client(module, func, argv);
+	if (!_clientmanager->has_client(uuid)) {
+		return;
 	}
+
+	auto client_channel = _clientmanager->get_client(uuid);
+	std::shared_ptr<caller::gate_call_client> _caller = std::make_shared<caller::gate_call_client>(client_channel);
+	_caller->call_client(module, func, argv);
 }
 
 void forward_hub_call_group_client(std::shared_ptr<gate::clientmanager> _clientmanager, std::shared_ptr<std::vector<boost::any> > uuids, std::string module, std::string func, std::shared_ptr<std::vector<boost::any> > argv) {
 	for (auto uuid : *uuids) {
-		if (_clientmanager->has_client(boost::any_cast<std::string>(uuid))) {
-			auto client_channel = _clientmanager->get_client(boost::any_cast<std::string>(uuid));
-
-			std::shared_ptr<caller::gate_call_client> _caller = std::make_shared<caller::gate_call_client>(client_channel);
-			_caller->call_client(module, func, argv);
+		if (!_clientmanager->has_client(boost::any_cast<std::string>(uuid))) {
+			continue;
 		}
+
+		auto client_channel = _clientmanager->get_client(boost::any_cast<std::string>(uuid));
+		std::shared_ptr<caller::gate_call_client> _caller = std::make_shared<caller::gate_call_client>(client_channel);
+		_caller->call_client(module, func, argv);
 	}
 }
 

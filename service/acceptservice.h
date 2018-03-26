@@ -60,6 +60,10 @@ public:
 	}
 
 	void ChannelDisconn(std::shared_ptr<channel> ch) {
+		if (!sigchanneldisconnect.empty()) {
+			sigchanneldisconnect(ch);
+		}
+
 		gc_fn_list.push_back([this, ch]() {
 			_process->unreg_channel(ch);
 		});

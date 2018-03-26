@@ -16,6 +16,7 @@
 #include <gate_call_hubcaller.h>
 
 #include "hubsvrmanager.h"
+#include "gc_poll.h"
 
 namespace gate {
 
@@ -59,18 +60,11 @@ public:
 			});
 		}
 
-		for (auto _client : remove_client) {
-			client_server_time.erase(_client);
-			client_time.erase(_client);
-
-			auto client_uuid = client_uuid_map[_client];
-			client_uuid_map.erase(_client);
-			client_map.erase(client_uuid);
-			
-			heartbeats_client.erase(_client);
-
-			_client->disconnect();
-		}
+		gate::gc_put([this, remove_client]() {
+			for (auto _client : remove_client) {
+				_client->disconnect();
+			}
+		});
 	}
 
 	void refresh_and_check_client(std::shared_ptr<juggle::Ichannel> _client, int64_t servertick, int64_t clienttick) {
