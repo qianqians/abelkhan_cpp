@@ -38,24 +38,24 @@
   <span class="keyword">typedef</span> <span class="identifier">RealType</span> <a name="boost.compute.normal_distribution.result_type"></a><span class="identifier">result_type</span><span class="special">;</span>
 
   <span class="comment">// <a class="link" href="normal_distribution.html#boost.compute.normal_distributionconstruct-copy-destruct">construct/copy/destruct</a></span>
-  <a class="link" href="normal_distribution.html#idp23838800-bb"><span class="identifier">normal_distribution</span></a><span class="special">(</span><span class="identifier">RealType</span> <span class="special">=</span> <span class="number">0</span><span class="special">.</span><span class="identifier">f</span><span class="special">,</span> <span class="identifier">RealType</span> <span class="special">=</span> <span class="number">1</span><span class="special">.</span><span class="identifier">f</span><span class="special">)</span><span class="special">;</span>
-  <a class="link" href="normal_distribution.html#idp23842400-bb"><span class="special">~</span><span class="identifier">normal_distribution</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="normal_distribution.html#idp43455472-bb"><span class="identifier">normal_distribution</span></a><span class="special">(</span><span class="identifier">RealType</span> <span class="special">=</span> <span class="number">0</span><span class="special">.</span><span class="identifier">f</span><span class="special">,</span> <span class="identifier">RealType</span> <span class="special">=</span> <span class="number">1</span><span class="special">.</span><span class="identifier">f</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="normal_distribution.html#idp43459072-bb"><span class="special">~</span><span class="identifier">normal_distribution</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
 
-  <span class="comment">// <a class="link" href="normal_distribution.html#idp23825904-bb">public member functions</a></span>
-  <span class="identifier">result_type</span> <a class="link" href="normal_distribution.html#idp23826464-bb"><span class="identifier">mean</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
-  <span class="identifier">result_type</span> <a class="link" href="normal_distribution.html#idp23827904-bb"><span class="identifier">stddev</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
-  <span class="identifier">result_type</span> <span class="identifier">min</span> <a class="link" href="normal_distribution.html#idp23829344-bb"><span class="identifier">BOOST_PREVENT_MACRO_SUBSTITUTION</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
-  <span class="identifier">result_type</span> <span class="identifier">max</span> <a class="link" href="normal_distribution.html#idp23830800-bb"><span class="identifier">BOOST_PREVENT_MACRO_SUBSTITUTION</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="comment">// <a class="link" href="normal_distribution.html#idp43442576-bb">public member functions</a></span>
+  <span class="identifier">result_type</span> <a class="link" href="normal_distribution.html#idp43443136-bb"><span class="identifier">mean</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="identifier">result_type</span> <a class="link" href="normal_distribution.html#idp43444576-bb"><span class="identifier">stddev</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="identifier">result_type</span> <span class="identifier">min</span> <a class="link" href="normal_distribution.html#idp43446016-bb"><span class="identifier">BOOST_PREVENT_MACRO_SUBSTITUTION</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="identifier">result_type</span> <span class="identifier">max</span> <a class="link" href="normal_distribution.html#idp43447472-bb"><span class="identifier">BOOST_PREVENT_MACRO_SUBSTITUTION</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
   <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> OutputIterator<span class="special">,</span> <span class="keyword">typename</span> Generator<span class="special">&gt;</span> 
-    <span class="keyword">void</span> <a class="link" href="normal_distribution.html#idp23832256-bb"><span class="identifier">generate</span></a><span class="special">(</span><span class="identifier">OutputIterator</span><span class="special">,</span> <span class="identifier">OutputIterator</span><span class="special">,</span> <span class="identifier">Generator</span> <span class="special">&amp;</span><span class="special">,</span> 
+    <span class="keyword">void</span> <a class="link" href="normal_distribution.html#idp43448928-bb"><span class="identifier">generate</span></a><span class="special">(</span><span class="identifier">OutputIterator</span><span class="special">,</span> <span class="identifier">OutputIterator</span><span class="special">,</span> <span class="identifier">Generator</span> <span class="special">&amp;</span><span class="special">,</span> 
                   <span class="identifier">command_queue</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
 
-  <span class="comment">// <a class="link" href="normal_distribution.html#idp23843008-bb">private member functions</a></span>
-   <a class="link" href="normal_distribution.html#idp23843584-bb"><span class="identifier">BOOST_STATIC_ASSERT_MSG</span></a><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">is_floating_point</span><span class="special">&lt;</span> <span class="identifier">RealType</span> <span class="special">&gt;</span><span class="special">::</span><span class="identifier">value</span><span class="special">,</span> 
+  <span class="comment">// <a class="link" href="normal_distribution.html#idp43459680-bb">private member functions</a></span>
+   <a class="link" href="normal_distribution.html#idp43460256-bb"><span class="identifier">BOOST_STATIC_ASSERT_MSG</span></a><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">is_floating_point</span><span class="special">&lt;</span> <span class="identifier">RealType</span> <span class="special">&gt;</span><span class="special">::</span><span class="identifier">value</span><span class="special">,</span> 
                            <span class="string">"Template argument must be a floating point type"</span><span class="special">)</span><span class="special">;</span>
 <span class="special">}</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idp102607888"></a><h2>Description</h2>
+<a name="idp101304576"></a><h2>Description</h2>
 <p>The following example shows how to setup a normal distribution to produce random <code class="computeroutput">float</code> values centered at <code class="computeroutput">5</code>:</p>
 <pre class="programlisting"></pre>
 <p> </p>
@@ -64,43 +64,43 @@
 <p>
 </p>
 <div class="refsect2">
-<a name="idp102612544"></a><h3>
+<a name="idp101308720"></a><h3>
 <a name="boost.compute.normal_distributionconstruct-copy-destruct"></a><code class="computeroutput">normal_distribution</code> 
         public
        construct/copy/destruct</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem">
-<pre class="literallayout"><a name="idp23838800-bb"></a><span class="identifier">normal_distribution</span><span class="special">(</span><span class="identifier">RealType</span> mean <span class="special">=</span> <span class="number">0</span><span class="special">.</span><span class="identifier">f</span><span class="special">,</span> <span class="identifier">RealType</span> stddev <span class="special">=</span> <span class="number">1</span><span class="special">.</span><span class="identifier">f</span><span class="special">)</span><span class="special">;</span></pre>
+<pre class="literallayout"><a name="idp43455472-bb"></a><span class="identifier">normal_distribution</span><span class="special">(</span><span class="identifier">RealType</span> mean <span class="special">=</span> <span class="number">0</span><span class="special">.</span><span class="identifier">f</span><span class="special">,</span> <span class="identifier">RealType</span> stddev <span class="special">=</span> <span class="number">1</span><span class="special">.</span><span class="identifier">f</span><span class="special">)</span><span class="special">;</span></pre>
 <p>Creates a new normal distribution producing numbers with the given <code class="computeroutput">mean</code> and <code class="computeroutput">stddev</code>. </p>
 </li>
 <li class="listitem">
-<pre class="literallayout"><a name="idp23842400-bb"></a><span class="special">~</span><span class="identifier">normal_distribution</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>Destroys the normal distribution object. </li>
+<pre class="literallayout"><a name="idp43459072-bb"></a><span class="special">~</span><span class="identifier">normal_distribution</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>Destroys the normal distribution object. </li>
 </ol></div>
 </div>
 <div class="refsect2">
-<a name="idp102631056"></a><h3>
-<a name="idp23825904-bb"></a><code class="computeroutput">normal_distribution</code> public member functions</h3>
+<a name="idp101325392"></a><h3>
+<a name="idp43442576-bb"></a><code class="computeroutput">normal_distribution</code> public member functions</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem">
-<pre class="literallayout"><span class="identifier">result_type</span> <a name="idp23826464-bb"></a><span class="identifier">mean</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>Returns the mean value of the distribution. </li>
+<pre class="literallayout"><span class="identifier">result_type</span> <a name="idp43443136-bb"></a><span class="identifier">mean</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>Returns the mean value of the distribution. </li>
 <li class="listitem">
-<pre class="literallayout"><span class="identifier">result_type</span> <a name="idp23827904-bb"></a><span class="identifier">stddev</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>Returns the standard-deviation of the distribution. </li>
+<pre class="literallayout"><span class="identifier">result_type</span> <a name="idp43444576-bb"></a><span class="identifier">stddev</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>Returns the standard-deviation of the distribution. </li>
 <li class="listitem">
-<pre class="literallayout"><span class="identifier">result_type</span> <span class="identifier">min</span> <a name="idp23829344-bb"></a><span class="identifier">BOOST_PREVENT_MACRO_SUBSTITUTION</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>Returns the minimum value of the distribution. </li>
+<pre class="literallayout"><span class="identifier">result_type</span> <span class="identifier">min</span> <a name="idp43446016-bb"></a><span class="identifier">BOOST_PREVENT_MACRO_SUBSTITUTION</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>Returns the minimum value of the distribution. </li>
 <li class="listitem">
-<pre class="literallayout"><span class="identifier">result_type</span> <span class="identifier">max</span> <a name="idp23830800-bb"></a><span class="identifier">BOOST_PREVENT_MACRO_SUBSTITUTION</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>Returns the maximum value of the distribution. </li>
+<pre class="literallayout"><span class="identifier">result_type</span> <span class="identifier">max</span> <a name="idp43447472-bb"></a><span class="identifier">BOOST_PREVENT_MACRO_SUBSTITUTION</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>Returns the maximum value of the distribution. </li>
 <li class="listitem">
 <pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> OutputIterator<span class="special">,</span> <span class="keyword">typename</span> Generator<span class="special">&gt;</span> 
-  <span class="keyword">void</span> <a name="idp23832256-bb"></a><span class="identifier">generate</span><span class="special">(</span><span class="identifier">OutputIterator</span> first<span class="special">,</span> <span class="identifier">OutputIterator</span> last<span class="special">,</span> 
+  <span class="keyword">void</span> <a name="idp43448928-bb"></a><span class="identifier">generate</span><span class="special">(</span><span class="identifier">OutputIterator</span> first<span class="special">,</span> <span class="identifier">OutputIterator</span> last<span class="special">,</span> 
                 <span class="identifier">Generator</span> <span class="special">&amp;</span> generator<span class="special">,</span> <span class="identifier">command_queue</span> <span class="special">&amp;</span> queue<span class="special">)</span><span class="special">;</span></pre>
 <p>Generates normally-distributed floating-point numbers and stores them to the range [<code class="computeroutput">first</code>, <code class="computeroutput">last</code>). </p>
 </li>
 </ol></div>
 </div>
 <div class="refsect2">
-<a name="idp102671408"></a><h3>
-<a name="idp23843008-bb"></a><code class="computeroutput">normal_distribution</code> private member functions</h3>
-<div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><pre class="literallayout"> <a name="idp23843584-bb"></a><span class="identifier">BOOST_STATIC_ASSERT_MSG</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">is_floating_point</span><span class="special">&lt;</span> <span class="identifier">RealType</span> <span class="special">&gt;</span><span class="special">::</span><span class="identifier">value</span><span class="special">,</span> 
+<a name="idp101361408"></a><h3>
+<a name="idp43459680-bb"></a><code class="computeroutput">normal_distribution</code> private member functions</h3>
+<div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><pre class="literallayout"> <a name="idp43460256-bb"></a><span class="identifier">BOOST_STATIC_ASSERT_MSG</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">is_floating_point</span><span class="special">&lt;</span> <span class="identifier">RealType</span> <span class="special">&gt;</span><span class="special">::</span><span class="identifier">value</span><span class="special">,</span> 
                          <span class="string">"Template argument must be a floating point type"</span><span class="special">)</span><span class="special">;</span></pre></li></ol></div>
 </div>
 </div>
