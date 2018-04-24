@@ -88,7 +88,6 @@ void client::on_ack_connect_gate()
 	_client_call_gate->heartbeats(timer.Tick);
 
 	timer.addticktimer(timer.Tick + 30 * 1000, std::bind(&client::heartbeats, this, std::placeholders::_1));
-	timer.addticktimer(timer.Tick + 10 * 1000, std::bind(&client::refresh_udp_link, this, std::placeholders::_1));
 
 	sigConnectGate();
 }

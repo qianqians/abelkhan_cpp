@@ -32,11 +32,14 @@ public:
 
 private:
 	void heartbeats(int64_t tick);
+	void refresh_udp_link(int64_t tick);
 
 	void on_ack_heartbeats();
 	void on_ack_connect_gate();
 	void on_ack_connect_hub(std::string _hub_name);
 	void on_call_client(std::string module_name, std::string func_name, std::shared_ptr<std::vector<boost::any> > _argvs);
+	
+	void on_confirm_refresh_udp_end_point();
 
 public:
 	std::string uuid;
