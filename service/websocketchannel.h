@@ -65,14 +65,15 @@ public:
 
 				if ((len + tmp_buff_offset + 4) <= tmp_buff_len)
 				{
-					std::string json_str((char*)(&tmp_buff[4]), len);
+					tmp_buff_offset += len + 4;
+
+					auto json_buff = &tmp_buff[4];
+					std::string json_str((char*)(json_buff), len);
 					try
 					{
 						Fossilizid::JsonParse::JsonObject obj;
 						Fossilizid::JsonParse::unpacker(obj, json_str);
 						que.push(boost::any_cast<Fossilizid::JsonParse::JsonArray>(obj));
-
-						tmp_buff_offset += len + 4;
 					}
 					catch (Fossilizid::JsonParse::jsonformatexception e)
 					{
@@ -135,7 +136,6 @@ public:
 
 		try {
 			auto data = Fossilizid::JsonParse::pack(in);
-
 			size_t len = data.size();
 			unsigned char * _data = new unsigned char[len + 4];
 			_data[0] = len & 0xff;

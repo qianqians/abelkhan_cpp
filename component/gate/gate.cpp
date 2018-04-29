@@ -24,6 +24,7 @@
 #include <client_call_gatemodule.h>
 #include <center_call_servermodule.h>
 
+#include "compress_and_encrypt.h"
 #include "centerproxy.h"
 #include "closehandle.h"
 #include "clientmanager.h"
@@ -48,6 +49,8 @@ void main(int argc, char * argv[]) {
 	if (argc >= 3) {
 		_config = _config->get_value_dict(argv[2]);
 	}
+
+	auto xor_key = (unsigned char)(_config->get_value_int("key") % 256);
 
 	std::shared_ptr<service::timerservice> _timerservice = std::make_shared<service::timerservice>();
 
@@ -80,6 +83,11 @@ void main(int argc, char * argv[]) {
 	auto outside_ip = _config->get_value_string("outside_ip");
 	auto outside_port = (short)_config->get_value_int("outside_port");
 	auto _client_service = std::make_shared<service::acceptservice>(outside_ip, outside_port, _client_process);
+	_client_service->sigchannelconnect.connect([xor_key](std::shared_ptr<juggle::Ichannel> ch) {
+		auto _ch = std::static_pointer_cast<service::channel>(ch);
+		_ch->is_compress_and_encrypt = true;
+		_ch->xor_key = xor_key;
+	});
 	_client_service->sigchanneldisconnect.connect([_clientmanager](std::shared_ptr<juggle::Ichannel> ch) {
 		gate::gc_put([_clientmanager, ch]() {
 			_clientmanager->unreg_client(ch);

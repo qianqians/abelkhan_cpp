@@ -23,7 +23,7 @@ public:
 	boost::signals2::signal<void(std::string hub_name)> sigConnectHub;
 
 public:
-	client();
+	client(uint64_t xor_key);
 
 	bool connect_server(std::string tcp_ip, short tcp_port, int64_t tick);
 	void connect_hub(std::string hub_name);
@@ -32,14 +32,11 @@ public:
 
 private:
 	void heartbeats(int64_t tick);
-	void refresh_udp_link(int64_t tick);
 
 	void on_ack_heartbeats();
 	void on_ack_connect_gate();
 	void on_ack_connect_hub(std::string _hub_name);
 	void on_call_client(std::string module_name, std::string func_name, std::shared_ptr<std::vector<boost::any> > _argvs);
-	
-	void on_confirm_refresh_udp_end_point();
 
 public:
 	std::string uuid;
@@ -47,6 +44,7 @@ public:
 	common::modulemanager modules;
 
 private:
+	unsigned char xor_key;
 	int64_t _heartbeats;
 	
 	std::shared_ptr<service::connectservice> _tcp_conn;

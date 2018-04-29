@@ -23,7 +23,7 @@ public:
 	boost::signals2::signal<void(std::string hub_name)> sigConnectHub;
 
 public:
-	client();
+	client(uint64_t xor_key);
 
 	bool connect_server(std::string tcp_ip, short tcp_port, int64_t tick);
 	void connect_hub(std::string hub_name);
@@ -44,6 +44,7 @@ public:
 	common::modulemanager modules;
 
 private:
+	unsigned char xor_key;
 	int64_t _heartbeats;
 	
 	std::shared_ptr<service::connectservice> _tcp_conn;

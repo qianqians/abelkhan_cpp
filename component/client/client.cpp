@@ -13,8 +13,10 @@
 namespace client
 {
 
-client::client()
+client::client(uint64_t _xor_key)
 {
+	xor_key = _xor_key % 256;
+
 	boost::uuids::random_generator g;
 	auto _uuid = g();
 	uuid = boost::lexical_cast<std::string>(_uuid);
@@ -35,7 +37,9 @@ client::client()
 
 bool client::connect_server(std::string tcp_ip, short tcp_port, int64_t tick)
 {
-	auto ch = _tcp_conn->connect(tcp_ip, tcp_port);
+	auto ch = std::static_pointer_cast<service::channel>(_tcp_conn->connect(tcp_ip, tcp_port));
+	ch->is_compress_and_encrypt = true;
+	ch->xor_key = xor_key;
 	_client_call_gate = std::make_shared<caller::client_call_gate>(ch);
 	_client_call_gate->connect_server(uuid, tick);
 

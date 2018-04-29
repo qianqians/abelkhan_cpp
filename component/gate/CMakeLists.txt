@@ -19,6 +19,12 @@ INCLUDE_DIRECTORIES(${time_header__PATH})
 
 file(GLOB time_header_files ../../time/ ../../time/*.h)
 
+set(ce_header__PATH ..//..//compress_and_encrypt CACHE PATH "ce include path")
+INCLUDE_DIRECTORIES(${ce_header__PATH})
+
+AUX_SOURCE_DIRECTORY(../../compress_and_encrypt/ ce_DIR_SRC)
+file(GLOB ce_header_files ../../compress_and_encrypt/ ../../compress_and_encrypt/*.h)
+
 set(juggle_header__PATH ..//..//tools//juggle//c++ CACHE PATH "juggle include path")
 INCLUDE_DIRECTORIES(${juggle_header__PATH})
 
@@ -42,7 +48,6 @@ file(GLOB service_header_files ../../service/ ../../service/*.h)
 
 set(module_header__PATH1 ..//..//module CACHE PATH "module include path")
 INCLUDE_DIRECTORIES(${module_header__PATH1})
-
 file(GLOB module_header_files1 ../../module/ ../../module/*.h)
 
 AUX_SOURCE_DIRECTORY(. DIR_SRC)
@@ -58,11 +63,14 @@ SET(header_files
     ${jsonparse_header_files}
     ${config_header_files}
     ${time_header_files}
+    ${ce_header_files}
 )
 
 SET(SRC_LIST 
     ${DIR_SRC}
     ${juggle_DIR_SRC}
+    ${ce_DIR_SRC}
 )
 
 ADD_EXECUTABLE(gate ${SRC_LIST} ${header_files})
+target_link_libraries(gate zlibstaticd)

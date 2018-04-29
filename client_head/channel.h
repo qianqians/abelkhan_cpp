@@ -13,6 +13,7 @@
 
 #include "JsonParse.h"
 #include "Ichannel.h"
+#include "compress_and_encrypt.h"
 
 namespace service
 {
@@ -29,6 +30,7 @@ public:
 		memset(buff, 0, buff_size);
 
 		is_close = false;
+		is_compress_and_encrypt = false;
 	}
 
 	void start()
@@ -43,6 +45,9 @@ public:
 
 	boost::signals2::signal<void(std::shared_ptr<channel>)> sigondisconn;
 	boost::signals2::signal<void(std::shared_ptr<channel>)> sigdisconn;
+
+	bool is_compress_and_encrypt;
+	unsigned char xor_key;
 
 private:
 	static void onRecv(std::shared_ptr<channel> ch, const boost::system::error_code& error, std::size_t bytes_transferred){
@@ -89,14 +94,27 @@ private:
 
 				if ((len + tmp_buff_offset + 4) <= tmp_buff_len)
 				{
-					std::string json_str((char*)(&tmp_buff[4]), len);
+					tmp_buff_offset += len + 4;
+
+					auto json_buff = &tmp_buff[4];
+					if (is_compress_and_encrypt)
+					{
+						std::lock_guard<std::mutex> l(compress_and_encrypt::e_and_c_mutex);
+						len = compress_and_encrypt::encrypt_and_compress(json_buff, len, xor_key);
+						auto tmp_json_buff = new unsigned char[len];
+						memcpy(tmp_json_buff, compress_and_encrypt::e_and_c_output_buff, len);
+						json_buff = tmp_json_buff;
+					}
+					std::string json_str((char*)(json_buff), len);
+					if (is_compress_and_encrypt)
+					{
+						delete[] json_buff;
+					}
 					try
 					{
 						Fossilizid::JsonParse::JsonObject obj;
 						Fossilizid::JsonParse::unpacker(obj, json_str);
 						que.push_back(boost::any_cast<Fossilizid::JsonParse::JsonArray>(obj));
-
-						tmp_buff_offset += len + 4;
 					}
 					catch (Fossilizid::JsonParse::jsonformatexception e)
 					{
@@ -170,35 +188,69 @@ public:
 
 		try {
 			auto data = Fossilizid::JsonParse::pack(in);
+			if (is_compress_and_encrypt)
+			{
+				size_t len = data.size();
+				unsigned char * _data = new unsigned char[len + 4];
+				_data[0] = len & 0xff;
+				_data[1] = len >> 8 & 0xff;
+				_data[2] = len >> 16 & 0xff;
+				_data[3] = len >> 24 & 0xff;
+				memcpy_s(&_data[4], len, data.c_str(), data.size());
+				size_t datasize = len + 4;
 
-			size_t len = data.size();
-			unsigned char * _data = new unsigned char[len + 4];
-			_data[0] = len & 0xff;
-			_data[1] = len >> 8 & 0xff;
-			_data[2] = len >> 16 & 0xff;
-			_data[3] = len >> 24 & 0xff;
-			memcpy_s(&_data[4], len, data.c_str(), data.size());
-			size_t datasize = len + 4;
+				size_t offset = 0;
+				while (offset < datasize) {
+					try {
+						offset += s->send(boost::asio::buffer(&_data[offset], datasize - offset));
+					}
+					catch (boost::system::system_error e) {
+						if (e.code() == boost::asio::error::would_block) {
+							boost::this_thread::sleep(boost::get_system_time() + boost::posix_time::microseconds(1));
+							continue;
+						}
+						else {
+							std::cout << "error:" << e.what() << std::endl;
+							is_close = true;
+							break;
+						}
+					}
+				}
 
-			size_t offset = 0;
-			while (offset < datasize) {
-				try {
-					offset += s->send(boost::asio::buffer(&_data[offset], datasize - offset));
-				}
-				catch (boost::system::system_error e) {
-					if (e.code() == boost::asio::error::would_block) {
-						boost::this_thread::sleep(boost::get_system_time() + boost::posix_time::microseconds(1));
-						continue;
-					}
-					else {
-						std::cout << "error:" << e.what() << std::endl;
-						is_close = true;
-						break;
-					}
-				}
+				delete[] _data;
 			}
+			else
+			{
+				std::lock_guard<std::mutex> l(compress_and_encrypt::c_and_e_mutex);
+				auto len = compress_and_encrypt::compress_and_encrypt((unsigned char*)data.c_str(), data.size(), xor_key);
+				unsigned char * _data = new unsigned char[len + 4];
+				_data[0] = len & 0xff;
+				_data[1] = len >> 8 & 0xff;
+				_data[2] = len >> 16 & 0xff;
+				_data[3] = len >> 24 & 0xff;
+				memcpy_s(&_data[4], len, compress_and_encrypt::c_and_e_output_buff, len);
+				size_t datasize = len + 4;
 
-			delete[] _data;
+				size_t offset = 0;
+				while (offset < datasize) {
+					try {
+						offset += s->send(boost::asio::buffer(&_data[offset], datasize - offset));
+					}
+					catch (boost::system::system_error e) {
+						if (e.code() == boost::asio::error::would_block) {
+							boost::this_thread::sleep(boost::get_system_time() + boost::posix_time::microseconds(1));
+							continue;
+						}
+						else {
+							std::cout << "error:" << e.what() << std::endl;
+							is_close = true;
+							break;
+						}
+					}
+				}
+
+				delete[] _data;
+			}
 		}
 		catch (std::exception e) {
 			std::cout << "error:" << e.what() << std::endl;
