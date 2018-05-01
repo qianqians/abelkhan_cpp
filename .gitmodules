@@ -1,9 +1,8 @@
-[submodule "tools/juggle"]
-	path = tools/juggle
-	url = https://github.com/qianqians/juggle.git
 [submodule "tools/lock-free"]
 	path = tools/lock-free
 	url = https://github.com/qianqians/lock-free.git
 [submodule "tools/jsonparsepp"]
+
 	path = tools/jsonparsepp
+
 	url = https://github.com/qianqians/jsonparsepp.git
