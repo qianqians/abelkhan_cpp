@@ -56,57 +56,57 @@ public:
 		(Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonTable>(handle))->find(key) == (Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonTable>(handle))->end();
 	}
 
-	bool config::get_value_bool(std::string key) {
+	bool get_value_bool(std::string key) {
 		return Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonBool>((*(Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonTable>(handle)))[key]);
 	}
 
-	int64_t config::get_value_int(std::string key) {
+	int64_t get_value_int(std::string key) {
 		return Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonInt>((*(Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonTable>(handle)))[key]);
 	}
 
-	double config::get_value_float(std::string key) {
+	double get_value_float(std::string key) {
 		return Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonFloat>((*(Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonTable>(handle)))[key]);
 	}
 
-	std::string config::get_value_string(std::string key) {
+	std::string get_value_string(std::string key) {
 		return Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonString>((*(Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonTable>(handle)))[key]);
 	}
 
-	std::shared_ptr<config> config::get_value_dict(std::string key) {
+	std::shared_ptr<config> get_value_dict(std::string key) {
 		auto _handle = (*(Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonTable>(handle)))[key];
 		config * _config = new config(_handle);
 
 		return std::shared_ptr<config>(_config, std::bind(config::releaseconfig, std::placeholders::_1));
 	}
 
-	std::shared_ptr<config> config::get_value_list(std::string key) {
+	std::shared_ptr<config> get_value_list(std::string key) {
 		auto _handle = (*(Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonTable>(handle)))[key];
 		config * _config = new config(_handle);
 
 		return std::shared_ptr<config>(_config, std::bind(config::releaseconfig, std::placeholders::_1));
 	}
 
-	size_t config::get_list_size() {
+	size_t get_list_size() {
 		return (Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonArray>(handle))->size();
 	}
 
-	bool config::get_list_bool(int index) {
+	bool get_list_bool(int index) {
 		return Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonBool>((*(Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonArray>(handle)))[index]);
 	}
 
-	int64_t config::get_list_int(int index) {
+	int64_t get_list_int(int index) {
 		return Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonInt>((*(Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonArray>(handle)))[index]);
 	}
 
-	double config::get_list_float(int index) {
+	double get_list_float(int index) {
 		return Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonFloat>((*(Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonArray>(handle)))[index]);
 	}
 
-	std::string config::get_list_string(int index) {
+	std::string get_list_string(int index) {
 		return Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonString>((*(Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonArray>(handle)))[index]);
 	}
 
-	std::shared_ptr<config> config::get_list_dict(int index) {
+	std::shared_ptr<config> get_list_dict(int index) {
 		auto _handle = (*(Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonArray>(handle)))[index];
 		config * _config = new config(_handle);
 

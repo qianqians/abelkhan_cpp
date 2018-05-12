@@ -142,7 +142,7 @@ public:
 			_data[1] = len >> 8 & 0xff;
 			_data[2] = len >> 16 & 0xff;
 			_data[3] = len >> 24 & 0xff;
-			memcpy_s(&_data[4], len, data.c_str(), data.size());
+			memcpy(&_data[4], data.c_str(), data.size());
 			size_t datasize = len + 4;
 
 			server->send(hdl, _data, datasize, websocketpp::frame::opcode::binary);
