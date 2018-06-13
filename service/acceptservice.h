@@ -22,6 +22,10 @@ public:
 
 		boost::asio::ip::tcp::endpoint ep(boost::asio::ip::address::from_string(ip), port);
 		_acceptor.open(ep.protocol());
+
+		boost::asio::socket_base::reuse_address opt(true);
+		_acceptor.set_option(opt);
+
 		_acceptor.bind(ep);
 		_acceptor.listen();
 
