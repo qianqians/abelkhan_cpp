@@ -13,16 +13,21 @@
 #include "hubsvrmanager.h"
 #include "clientmanager.h"
 
-void connect_server(std::shared_ptr<gate::clientmanager> _clientmanager, std::shared_ptr<service::timerservice> _timerservice, std::string uuid, int64_t clienttick) {
+void connect_server(std::shared_ptr<gate::hubsvrmanager> _hubsvrmanager, std::shared_ptr<gate::clientmanager> _clientmanager, std::shared_ptr<service::timerservice> _timerservice, std::string uuid, int64_t clienttick) {
 	if (_clientmanager->has_client(uuid)){
 		return;
 	}
 
 	std::cout << "client connect " << uuid << std::endl;
 
+	_hubsvrmanager->for_each_hub([uuid](std::string hub_name, std::shared_ptr<juggle::Ichannel> ch) {
+		auto _hubproxy = std::make_shared<caller::gate_call_hub>(ch);
+		_hubproxy->client_connect(uuid);
+	});
+
 	_clientmanager->reg_client(uuid, juggle::current_ch, _timerservice->Tick, clienttick);
 	auto _client_proxy = std::make_shared<caller::gate_call_client>(juggle::current_ch);
-	_client_proxy->connect_gate_sucess();
+	_client_proxy->connect_server_sucess();
 }
 
 void cancle_server(std::shared_ptr<gate::clientmanager> _clientmanager) {
@@ -37,28 +42,6 @@ void enable_heartbeats(std::shared_ptr<gate::clientmanager> _clientmanager)
 void disable_heartbeats(std::shared_ptr<gate::clientmanager> _clientmanager)
 {
 	_clientmanager->disable_heartbeats(juggle::current_ch);
-}
-
-void connect_hub(std::shared_ptr<gate::hubsvrmanager> _hubsvrmanager, std::string client_uuid, std::string hub_name){
-	auto _hub_ch = _hubsvrmanager->get_hub(hub_name);
-	if (_hub_ch == nullptr)
-	{
-		return;
-	}
-
-	auto _hubproxy = std::make_shared<caller::gate_call_hub>(_hub_ch);
-	_hubproxy->client_connect(client_uuid);
-}
-
-void disconnect_hub(std::shared_ptr<gate::hubsvrmanager> _hubsvrmanager, std::string client_uuid, std::string hub_name){
-	auto _hub_ch = _hubsvrmanager->get_hub(hub_name);
-	if (_hub_ch == nullptr)
-	{
-		return;
-	}
-
-	auto _hubproxy = std::make_shared<caller::gate_call_hub>(_hub_ch);
-	_hubproxy->client_disconnect(client_uuid);
 }
 
 void forward_client_call_hub(std::shared_ptr<gate::clientmanager> _clientmanager, std::shared_ptr<gate::hubsvrmanager> _hubsvrmanager, std::string hub_name, std::string module_name, std::string func_name, std::shared_ptr<std::vector<boost::any> > argv) {

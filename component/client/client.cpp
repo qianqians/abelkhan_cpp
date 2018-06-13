@@ -24,8 +24,7 @@ client::client(uint64_t _xor_key)
 	_heartbeats = 0;
 
 	_gate_call_client = std::make_shared<module::gate_call_client>();
-	_gate_call_client->sig_connect_gate_sucess.connect(std::bind(&client::on_ack_connect_gate, this));
-	_gate_call_client->sig_connect_hub_sucess.connect(std::bind(&client::on_ack_connect_hub, this, std::placeholders::_1));
+	_gate_call_client->sig_connect_server_sucess.connect(std::bind(&client::on_ack_connect_server, this));
 	_gate_call_client->sig_call_client.connect(std::bind(&client::on_call_client, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 	_gate_call_client->sig_ack_heartbeats.connect(std::bind(&client::on_ack_heartbeats, this));
 	auto tcp_process = std::make_shared<juggle::process>();
@@ -44,11 +43,6 @@ bool client::connect_server(std::string tcp_ip, short tcp_port, int64_t tick)
 	_client_call_gate->connect_server(uuid, tick);
 
 	return true;
-}
-
-void client::connect_hub(std::string hub_name)
-{
-	_client_call_gate->connect_hub(uuid, hub_name);
 }
 
 void client::call_hub(std::string hub_name, std::string module_name, std::string func_name, std::shared_ptr<std::vector<boost::any> > _argvs)
@@ -86,19 +80,14 @@ void client::on_ack_heartbeats()
 	_heartbeats = timer.Tick;
 }
 
-void client::on_ack_connect_gate()
+void client::on_ack_connect_server()
 {
 	_heartbeats = timer.Tick;
 	_client_call_gate->heartbeats(timer.Tick);
 
 	timer.addticktimer(timer.Tick + 30 * 1000, std::bind(&client::heartbeats, this, std::placeholders::_1));
 
-	sigConnectGate();
-}
-
-void client::on_ack_connect_hub(std::string _hub_name)
-{
-	sigConnectHub(_hub_name);
+	sigConnectServer();
 }
 
 void client::on_call_client(std::string module_name, std::string func_name, std::shared_ptr<std::vector<boost::any> > _argvs)

@@ -12,8 +12,7 @@ class gate_call_client : public juggle::Imodule {
 public:
     gate_call_client(){
         module_name = "gate_call_client";
-        protcolcall_set.insert(std::make_pair("connect_gate_sucess", std::bind(&gate_call_client::connect_gate_sucess, this, std::placeholders::_1)));
-        protcolcall_set.insert(std::make_pair("connect_hub_sucess", std::bind(&gate_call_client::connect_hub_sucess, this, std::placeholders::_1)));
+        protcolcall_set.insert(std::make_pair("connect_server_sucess", std::bind(&gate_call_client::connect_server_sucess, this, std::placeholders::_1)));
         protcolcall_set.insert(std::make_pair("ack_heartbeats", std::bind(&gate_call_client::ack_heartbeats, this, std::placeholders::_1)));
         protcolcall_set.insert(std::make_pair("call_client", std::bind(&gate_call_client::call_client, this, std::placeholders::_1)));
     }
@@ -21,15 +20,9 @@ public:
     ~gate_call_client(){
     }
 
-    boost::signals2::signal<void() > sig_connect_gate_sucess;
-    void connect_gate_sucess(std::shared_ptr<std::vector<boost::any> > _event){
-        sig_connect_gate_sucess();
-    }
-
-    boost::signals2::signal<void(std::string) > sig_connect_hub_sucess;
-    void connect_hub_sucess(std::shared_ptr<std::vector<boost::any> > _event){
-        sig_connect_hub_sucess(
-            boost::any_cast<std::string>((*_event)[0]));
+    boost::signals2::signal<void() > sig_connect_server_sucess;
+    void connect_server_sucess(std::shared_ptr<std::vector<boost::any> > _event){
+        sig_connect_server_sucess();
     }
 
     boost::signals2::signal<void() > sig_ack_heartbeats;

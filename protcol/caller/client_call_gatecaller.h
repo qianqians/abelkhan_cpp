@@ -54,26 +54,6 @@ public:
         ch->push(v);
     }
 
-    void connect_hub(std::string argv0,std::string argv1){
-        auto v = std::make_shared<std::vector<boost::any> >();
-        v->push_back("client_call_gate");
-        v->push_back("connect_hub");
-        v->push_back(std::make_shared<std::vector<boost::any> >());
-        (boost::any_cast<std::shared_ptr<std::vector<boost::any> > >((*v)[2]))->push_back(argv0);
-        (boost::any_cast<std::shared_ptr<std::vector<boost::any> > >((*v)[2]))->push_back(argv1);
-        ch->push(v);
-    }
-
-    void disconnect_hub(std::string argv0,std::string argv1){
-        auto v = std::make_shared<std::vector<boost::any> >();
-        v->push_back("client_call_gate");
-        v->push_back("disconnect_hub");
-        v->push_back(std::make_shared<std::vector<boost::any> >());
-        (boost::any_cast<std::shared_ptr<std::vector<boost::any> > >((*v)[2]))->push_back(argv0);
-        (boost::any_cast<std::shared_ptr<std::vector<boost::any> > >((*v)[2]))->push_back(argv1);
-        ch->push(v);
-    }
-
     void forward_client_call_hub(std::string argv0,std::string argv1,std::string argv2,std::shared_ptr<std::vector<boost::any> > argv3){
         auto v = std::make_shared<std::vector<boost::any> >();
         v->push_back("client_call_gate");

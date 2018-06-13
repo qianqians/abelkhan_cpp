@@ -34,8 +34,8 @@ void connect_sucess(std::shared_ptr<gate::clientmanager> _clientmanager, std::sh
 	}
 
 	auto _client_channel = _clientmanager->get_client(client_uuid);
-	auto _client_caller = std::make_shared<caller::gate_call_client>(_client_channel);
-	_client_caller->connect_hub_sucess(_hub_name);
+	//auto _client_caller = std::make_shared<caller::gate_call_client>(_client_channel);
+	//_client_caller->connect_hub_sucess(_hub_name);
 }
 
 void disconnect_client(std::shared_ptr<gate::clientmanager> _clientmanager, std::string client_uuid){

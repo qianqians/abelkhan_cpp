@@ -20,20 +20,11 @@ public:
     ~gate_call_client(){
     }
 
-    void connect_gate_sucess(){
+    void connect_server_sucess(){
         auto v = std::make_shared<std::vector<boost::any> >();
         v->push_back("gate_call_client");
-        v->push_back("connect_gate_sucess");
+        v->push_back("connect_server_sucess");
         v->push_back(std::make_shared<std::vector<boost::any> >());
-        ch->push(v);
-    }
-
-    void connect_hub_sucess(std::string argv0){
-        auto v = std::make_shared<std::vector<boost::any> >();
-        v->push_back("gate_call_client");
-        v->push_back("connect_hub_sucess");
-        v->push_back(std::make_shared<std::vector<boost::any> >());
-        (boost::any_cast<std::shared_ptr<std::vector<boost::any> > >((*v)[2]))->push_back(argv0);
         ch->push(v);
     }
 

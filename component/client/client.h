@@ -19,14 +19,12 @@ namespace client
 class client {
 public:
 	boost::signals2::signal<void()> sigDisconnect;
-	boost::signals2::signal<void()> sigConnectGate;
-	boost::signals2::signal<void(std::string hub_name)> sigConnectHub;
+	boost::signals2::signal<void()> sigConnectServer;
 
 public:
 	client(uint64_t xor_key);
 
 	bool connect_server(std::string tcp_ip, short tcp_port, int64_t tick);
-	void connect_hub(std::string hub_name);
 	void call_hub(std::string hub_name, std::string module_name, std::string func_name, std::shared_ptr<std::vector<boost::any> > _argvs);
 	int64_t poll();
 
@@ -34,8 +32,7 @@ private:
 	void heartbeats(int64_t tick);
 
 	void on_ack_heartbeats();
-	void on_ack_connect_gate();
-	void on_ack_connect_hub(std::string _hub_name);
+	void on_ack_connect_server();
 	void on_call_client(std::string module_name, std::string func_name, std::shared_ptr<std::vector<boost::any> > _argvs);
 
 public:
