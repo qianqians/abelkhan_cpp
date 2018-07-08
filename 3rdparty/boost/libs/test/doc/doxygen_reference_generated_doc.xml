@@ -2401,6 +2401,9 @@ Users/developers willing to implement their own formatter need to:<itemizedlist>
 <method name="set_stream"><type>void</type><parameter name=""><paramtype>output_format</paramtype></parameter><parameter name=""><paramtype>std::ostream &amp;</paramtype></parameter><purpose>Sets the stream for specific logger. </purpose><description><para><note><para>Has no effect if the specified format is not found </para></note>
 <formalpara><title>Since Boost 1.62 </title><para/></formalpara>
 </para></description></method>
+<method name="get_stream" cv="const"><type>std::ostream *</type><parameter name=""><paramtype>output_format</paramtype></parameter><purpose>Returns a pointer to the stream associated to specific logger. </purpose><description><para><note><para>Returns a null pointer if the format is not found </para></note>
+<formalpara><title>Since Boost 1.67 </title><para/></formalpara>
+</para></description></method>
 <method name="set_threshold_level"><type>void</type><parameter name=""><paramtype>log_level</paramtype></parameter><purpose>Sets the threshold level for all loggers/formatters. </purpose><description><para>This will override the log level of all loggers, whether enabled or not. </para></description></method>
 <method name="set_threshold_level"><type>void</type><parameter name=""><paramtype>output_format</paramtype></parameter><parameter name=""><paramtype>log_level</paramtype></parameter><purpose>Sets the threshold/log level of a specific format. </purpose><description><para><note><para>Has no effect if the specified format is not found </para></note>
 <formalpara><title>Since Boost 1.62 </title><para/></formalpara>
@@ -2553,8 +2556,14 @@ Users/developers willing to implement their own formatter need to:<itemizedlist>
 <para>Provides access to various Unit Test Framework runtime parameters. </para><para>Primarily for use by the framework itself </para><namespace name="boost">
 <namespace name="unit_test">
 <namespace name="runtime_config">
-<class name="stream_holder"><method-group name="public member functions">
-<method name="setup"><type>void</type><parameter name="stream_name"><paramtype>const const_string &amp;</paramtype></parameter></method>
+<class name="stream_holder"><struct name="callback_cleaner"><data-member name="m_cleaner_callback"><type>boost::function&lt; void()&gt;</type></data-member>
+<data-member name="m_file"><type>std::ofstream</type></data-member>
+<method-group name="public member functions">
+</method-group>
+<constructor><parameter name="cleaner_callback"><paramtype>boost::function&lt; void()&gt;</paramtype></parameter></constructor>
+<destructor/>
+</struct><method-group name="public member functions">
+<method name="setup"><type>void</type><parameter name="stream_name"><paramtype>const const_string &amp;</paramtype></parameter><parameter name="cleaner_callback"><paramtype>boost::function&lt; void()&gt; const &amp;</paramtype><default>boost::function&lt; void()&gt;()</default></parameter></method>
 <method name="ref" cv="const"><type>std::ostream &amp;</type></method>
 </method-group>
 <constructor specifiers="explicit"><parameter name="default_stream"><paramtype>std::ostream &amp;</paramtype><default>std::cout</default></parameter></constructor>
@@ -2692,10 +2701,10 @@ The wildcard is the symbol '*'. Only a unique wildcard per string is supported. 
 </struct><struct name="bt_iterator_traits"><template>
       <template-type-parameter name="T"/>
       <template-nontype-parameter name="is_forward_iterable"><type>bool</type><default><classname alt="boost::unit_test::is_forward_iterable">is_forward_iterable</classname>&lt;T&gt;::value</default></template-nontype-parameter>
-    </template></struct><struct-specialization name="bt_iterator_traits"><template>
+    </template><purpose>Helper structure for accessing the content of a container or an array. </purpose></struct><struct-specialization name="bt_iterator_traits"><template>
       <template-type-parameter name="T"/>
-    </template><specialization><template-arg>T</template-arg><template-arg>true</template-arg></specialization><typedef name="const_iterator"><type>T::const_iterator</type></typedef>
-<typedef name="value_type"><type>T::value_type</type></typedef>
+    </template><specialization><template-arg>T</template-arg><template-arg>true</template-arg></specialization><typedef name="value_type"><type>std::iterator_traits&lt; const_iterator &gt;::value_type</type></typedef>
+<data-member name="const_iterator"><type>decltype(boost::declval&lt; typename boost::add_const&lt; typename boost::remove_reference&lt; T &gt;::type &gt;::type &gt;().begin()) typedef</type></data-member>
 <method-group name="public member functions">
 <method name="BOOST_STATIC_ASSERT"><type/><parameter name=""><paramtype>(<classname>is_forward_iterable</classname>&lt; T &gt;::value)</paramtype></parameter></method>
 </method-group>
@@ -2703,6 +2712,10 @@ The wildcard is the symbol '*'. Only a unique wildcard per string is supported. 
 <method name="begin" specifiers="static"><type>const_iterator</type><parameter name="container"><paramtype>T const &amp;</paramtype></parameter></method>
 <method name="end" specifiers="static"><type>const_iterator</type><parameter name="container"><paramtype>T const &amp;</paramtype></parameter></method>
 <method name="size" specifiers="static"><type>std::size_t</type><parameter name="container"><paramtype>T const &amp;</paramtype></parameter></method>
+</method-group>
+<method-group name="private static functions">
+<method name="size" specifiers="static"><type>std::size_t</type><parameter name="container"><paramtype>T const &amp;</paramtype></parameter><parameter name=""><paramtype>std::true_type</paramtype></parameter></method>
+<method name="size" specifiers="static"><type>std::size_t</type><parameter name="container"><paramtype>T const &amp;</paramtype></parameter><parameter name=""><paramtype>std::false_type</paramtype></parameter></method>
 </method-group>
 </struct-specialization><struct-specialization name="bt_iterator_traits"><template>
       <template-type-parameter name="T"/>
@@ -2806,7 +2819,7 @@ The wildcard is the symbol '*'. Only a unique wildcard per string is supported. 
       <template-type-parameter name="NP"/>
       <template-type-parameter name="Keyword"/>
       <template-type-parameter name="DefaultType"><default>void</default></template-type-parameter>
-    </template><inherit access="public">mpl::if_&lt; is_same&lt; NP::id, Keyword::id &gt;::type, remove_cv&lt; NP::data_type &gt;::type, DefaultType &gt;</inherit><purpose>param_type&lt;Params,Keyword,Default&gt;::type is is the type of the parameter corresponding to the Keyword (if parameter is present) or Default </purpose></struct><struct-specialization name="param_type"><template>
+    </template><inherit access="public">mpl::if_&lt; is_same&lt; NP::id, Keyword::id &gt;::type, remove_cv&lt; NP::data_type &gt;::type, DefaultType &gt;</inherit><purpose>param_type&lt;Params,Keyword,Default&gt;::type is the type of the parameter corresponding to the Keyword (if parameter is present) or Default </purpose></struct><struct-specialization name="param_type"><template>
       <template-type-parameter name="NP"/>
       <template-type-parameter name="Rest"/>
       <template-type-parameter name="Keyword"/>
@@ -2814,7 +2827,7 @@ The wildcard is the symbol '*'. Only a unique wildcard per string is supported. 
     </template><specialization><template-arg>named_parameter_combine&lt; NP</template-arg><template-arg>Rest &gt;</template-arg><template-arg>Keyword</template-arg><template-arg>DefaultType</template-arg></specialization><inherit access="public">mpl::if_&lt; is_same&lt; NP::id, Keyword::id &gt;::type, remove_cv&lt; NP::data_type &gt;::type, param_type&lt; Rest, Keyword, DefaultType &gt;::type &gt;</inherit></struct-specialization><struct name="has_param"><template>
       <template-type-parameter name="NP"/>
       <template-type-parameter name="Keyword"/>
-    </template><inherit access="public">is_same&lt; NP::id, Keyword::id &gt;</inherit><purpose>has_param&lt;Params,Keyword&gt;::value is true id Params has parameter corresponding to the Keyword </purpose></struct><struct-specialization name="has_param"><template>
+    </template><inherit access="public">is_same&lt; NP::id, Keyword::id &gt;</inherit><purpose>has_param&lt;Params,Keyword&gt;::value is true if Params has parameter corresponding to the Keyword </purpose></struct><struct-specialization name="has_param"><template>
       <template-type-parameter name="NP"/>
       <template-type-parameter name="Rest"/>
       <template-type-parameter name="Keyword"/>

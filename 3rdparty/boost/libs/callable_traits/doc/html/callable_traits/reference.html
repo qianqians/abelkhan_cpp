@@ -1712,8 +1712,8 @@
 <span class="keyword">using</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">callable_traits</span><span class="special">::</span><span class="identifier">add_noexcept_t</span><span class="special">;</span>
 
 <span class="keyword">static_assert</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">is_same</span><span class="special">&lt;</span>
-	<span class="identifier">add_noexcept_t</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">()&gt;,</span>
-	<span class="keyword">int</span><span class="special">()</span> <span class="keyword">noexcept</span>
+    <span class="identifier">add_noexcept_t</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">()&gt;,</span>
+    <span class="keyword">int</span><span class="special">()</span> <span class="keyword">noexcept</span>
 <span class="special">&gt;{},</span> <span class="string">""</span><span class="special">);</span>
 
 <span class="keyword">int</span> <span class="identifier">main</span><span class="special">()</span> <span class="special">{}</span>
@@ -8075,8 +8075,8 @@
 <span class="keyword">using</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">callable_traits</span><span class="special">::</span><span class="identifier">remove_noexcept_t</span><span class="special">;</span>
 
 <span class="keyword">static_assert</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">is_same</span><span class="special">&lt;</span>
-	<span class="identifier">remove_noexcept_t</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">()</span> <span class="keyword">noexcept</span><span class="special">&gt;,</span>
-	<span class="keyword">int</span><span class="special">()</span>
+    <span class="identifier">remove_noexcept_t</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">()</span> <span class="keyword">noexcept</span><span class="special">&gt;,</span>
+    <span class="keyword">int</span><span class="special">()</span>
 <span class="special">&gt;{},</span> <span class="string">""</span><span class="special">);</span>
 
 <span class="keyword">int</span> <span class="identifier">main</span><span class="special">()</span> <span class="special">{}</span>

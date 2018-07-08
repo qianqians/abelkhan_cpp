@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.6.1">
+<meta name="generator" content="Asciidoctor 1.5.6.2">
 <meta name="author" content="Peter Dimov">
 <title>Boost.Mp11: A C++11 metaprogramming library</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
@@ -920,7 +920,7 @@ and <code>common_type_t</code>, which is defined as <code>typename common_type&l
 </div>
 <div class="paragraph">
 <p>As another example, consider the hypothetical type <code>expected&lt;T, E&#8230;&#8203;&gt;</code> that represents either a successful return with a value of <code>T</code>,
-or an unsucessful return with an error code of some type in the list <code>E&#8230;&#8203;</code>. The common type of <code>expected&lt;T1, E1, E2, E3&gt;</code> and
+or an unsuccessful return with an error code of some type in the list <code>E&#8230;&#8203;</code>. The common type of <code>expected&lt;T1, E1, E2, E3&gt;</code> and
 <code>expected&lt;T2, E1, E4, E5&gt;</code> is <code>expected&lt;common_type_t&lt;T1, T2&gt;, E1, E2, E3, E4, E5&gt;</code>. That is, the possible return values are
 combined into their common type, and we take the union of the set of error types.</p>
 </div>
@@ -2015,7 +2015,7 @@ otherwise. It&#8217;s the same as <code>std::enable_if_t&lt;I::value == 5&gt;</c
 <h4 id="mp_if_c_t_e">mp_if&lt;C, T, E&#8230;&#8203;&gt;</h4>
 <div class="literalblock">
 <div class="content">
-<pre>template&lt;class C, class T, class E...&gt; using mp_if =
+<pre>template&lt;class C, class T, class... E&gt; using mp_if =
     mp_if_c&lt;static_cast&lt;bool&gt;(C::value), T, E...&gt;;</pre>
 </div>
 </div>
@@ -2351,7 +2351,7 @@ using R1 = mp_all&lt;mp_transform&lt;eq, L1, L2&gt;&gt;; // mp_true</code></pre>
 <p>As <code>mp_transform</code>, but takes a quoted metafunction.</p>
 </div>
 <div class="listingblock">
-<div class="title">Code Example 54. Using mp_transform_q to count the occurences of <code>void</code> in a list</div>
+<div class="title">Code Example 54. Using mp_transform_q to count the occurrences of <code>void</code> in a list</div>
 <div class="content">
 <pre class="highlight"><code>using L1 = std::tuple&lt;void, int, float, void, int&gt;;
 
@@ -2403,7 +2403,7 @@ using R1 = mp_apply&lt;mp_plus,
 <h4 id="mp_transform_if_p_f_l">mp_transform_if&lt;P, F, L&#8230;&#8203;&gt;</h4>
 <div class="literalblock">
 <div class="content">
-<pre>template&lt;template&lt;class...&gt; class P, template&lt;class...&gt; class F, class L...&gt;
+<pre>template&lt;template&lt;class...&gt; class P, template&lt;class...&gt; class F, class... L&gt;
     using mp_transform_if = /*...*/;</pre>
 </div>
 </div>
@@ -2412,7 +2412,7 @@ using R1 = mp_apply&lt;mp_plus,
 <code>F&lt;T1, T2, &#8230;&#8203;, Tn&gt;</code>, and returns the result, where <code>Ti</code> are the corresponding elements of <code>Li</code>.</p>
 </div>
 <div class="listingblock">
-<div class="title">Code Example 55. Using mp_transform_if to replace the occurences of 'void' in a list with the corresponding elements of a second list</div>
+<div class="title">Code Example 55. Using mp_transform_if to replace the occurrences of 'void' in a list with the corresponding elements of a second list</div>
 <div class="content">
 <pre class="highlight"><code>using L1 = std::tuple&lt;void, int, float, void, int&gt;;
 using L2 = std::tuple&lt;char[1], char[2], char[3], char[4], char[5]&gt;;
@@ -2486,7 +2486,7 @@ using R1 = mp_transform_if&lt;first_is_void, second, L1, L2&gt;;
 <p>As <code>mp_transform_if</code>, but takes quoted metafunctions.</p>
 </div>
 <div class="listingblock">
-<div class="title">Code Example 56. Using mp_transform_if_q to replace the occurences of 'void' in a list with the corresponding elements of a second list</div>
+<div class="title">Code Example 56. Using mp_transform_if_q to replace the occurrences of 'void' in a list with the corresponding elements of a second list</div>
 <div class="content">
 <pre class="highlight"><code>using L1 = std::tuple&lt;void, int, float, void, int&gt;;
 using L2 = std::tuple&lt;char[1], char[2], char[3], char[4], char[5]&gt;;
@@ -2651,7 +2651,23 @@ using R1 = mp_fill&lt;L1, void&gt;; // std::pair&lt;void, void&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p><code>mp_repeat_c&lt;L, N&gt;</code> returns a list of the same type as <code>L</code> that consists of <code>N</code> concatenated copies of <code>L</code>.</p>
+<p><code>mp_repeat_c&lt;L, N&gt;</code> returns a list of the same form as <code>L</code> that consists of <code>N</code> concatenated copies of <code>L</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Code Example 59. Using mp_repeat_c</div>
+<div class="content">
+<pre class="highlight"><code>using L1 = tuple&lt;int&gt;;
+using R1 = mp_repeat_c&lt;L1, 3&gt;; // tuple&lt;int, int, int&gt;
+
+using L2 = pair&lt;int, float&gt;;
+using R2 = mp_repeat_c&lt;L2, 1&gt;; // pair&lt;int, float&gt;
+
+using L3 = mp_list&lt;int, float&gt;;
+using R3 = mp_repeat_c&lt;L3, 2&gt;; // mp_list&lt;int, float, int, float&gt;
+
+using L4 = mp_list&lt;int, float, double&gt;;
+using R4 = mp_repeat_c&lt;L4, 0&gt;; // mp_list&lt;&gt;</code></pre>
+</div>
 </div>
 </div>
 <div class="sect3">
@@ -2675,7 +2691,7 @@ using R1 = mp_fill&lt;L1, void&gt;; // std::pair&lt;void, void&gt;</code></pre>
 <div class="paragraph">
 <p><code>mp_product&lt;F, L1&lt;T1&#8230;&#8203;&gt;, L2&lt;T2&#8230;&#8203;&gt;, &#8230;&#8203;, Ln&lt;Tn&#8230;&#8203;&gt;&gt;</code> evaluates <code>F&lt;U1, U2, &#8230;&#8203;, Un&gt;</code> for values <code>Ui</code> taken from
 the Cartesian product of the lists, as if the elements <code>Ui</code> are formed by <code>n</code> nested loops, each traversing <code>Li</code>.
-It returns a list of type <code>L1</code> containing the results of the application of <code>F</code>.</p>
+It returns a list of the form <code>L1&lt;V&#8230;&#8203;&gt;</code> containing the results of the application of <code>F</code>.</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 85%;">
 <caption class="title">Illustration 7. mp_product on two lists</caption>
@@ -2814,7 +2830,7 @@ of the corresponding <code>std::integral_constant</code> types. Given</p>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>template&lt;class T, class... I&gt; struct S;</pre>
+<pre>template&lt;class T, T... I&gt; struct S;</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2894,7 +2910,7 @@ where <code>T</code> is the type of <code>N::value</code>.</p>
 </div>
 </div>
 <div class="paragraph">
-<p><code>mp_take_c&lt;L, N&gt;</code> returns a list of the same type as <code>L</code> containing the first <code>N</code> elements of <code>L</code>.</p>
+<p><code>mp_take_c&lt;L, N&gt;</code> returns a list of the same form as <code>L</code> containing the first <code>N</code> elements of <code>L</code>.</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 85%;">
 <caption class="title">Illustration 10. mp_take_c</caption>
@@ -3203,7 +3219,7 @@ where <code>T</code> is the type of <code>N::value</code>.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Copies the elements <code>T</code> of <code>L</code> for which <code>mp_to_bool&lt;P&lt;T&gt;&gt;</code> is <code>mp_true</code> to a new list of the same type and returns it.</p>
+<p>Copies the elements <code>T</code> of <code>L</code> for which <code>mp_to_bool&lt;P&lt;T&gt;&gt;</code> is <code>mp_true</code> to a new list of the same form and returns it.</p>
 </div>
 </div>
 <div class="sect3">
@@ -3284,7 +3300,7 @@ for the elements of <code>L&lt;U1&#8230;&#8203;&gt;</code> and <code>mp_false</c
 <p><code>mp_sort&lt;L, P&gt;</code> sorts the list <code>L</code> according to the strict weak ordering <code>mp_to_bool&lt;P&lt;T, U&gt;&gt;</code>.</p>
 </div>
 <div class="listingblock">
-<div class="title">Code Example 59. Using mp_sort to sort a list of std::ratio values</div>
+<div class="title">Code Example 60. Using mp_sort to sort a list of std::ratio values</div>
 <div class="content">
 <pre>#include &lt;ratio&gt;
 
@@ -3398,7 +3414,7 @@ using R1 = mp_sort&lt;L1, std::ratio_less&gt;; // mp_list&lt;ratio&lt;1,4&gt;, r
 </div>
 <div class="paragraph">
 <p><code>mp_find&lt;L, V&gt;</code> returns the index at which the type <code>V</code> is located in the list <code>L</code>. It&#8217;s an alias for <code>mp_size_t&lt;I&gt;</code>,
-where <code>I</code> is the zero-based index of the first occurence of <code>V</code> in <code>L</code>. If <code>L</code> does not contain <code>V</code>, <code>mp_find&lt;L, V&gt;</code>
+where <code>I</code> is the zero-based index of the first occurrence of <code>V</code> in <code>L</code>. If <code>L</code> does not contain <code>V</code>, <code>mp_find&lt;L, V&gt;</code>
 is <code>mp_size&lt;L&gt;</code>.</p>
 </div>
 </div>
@@ -3476,7 +3492,7 @@ is <code>mp_size&lt;L&gt;</code>.</p>
 <p><code>mp_fold&lt;L&lt;T1, T2, &#8230;&#8203;, Tn&gt;, V, F&gt;</code> is <code>F&lt; F&lt; F&lt; F&lt;V, T1&gt;, T2&gt;, &#8230;&#8203;&gt;, Tn&gt;</code>, or <code>V</code>, if <code>L</code> is empty.</p>
 </div>
 <div class="listingblock">
-<div class="title">Code Example 60. Using mp_fold to add the contents of a list of std::ratio values</div>
+<div class="title">Code Example 61. Using mp_fold to add the contents of a list of std::ratio values</div>
 <div class="content">
 <pre>#include &lt;ratio&gt;
 
@@ -3529,7 +3545,7 @@ using R1 = mp_fold&lt;L1, std::ratio&lt;0,1&gt;, std::ratio_add&gt;; // std::rat
 </div>
 </div>
 <div class="paragraph">
-<p><code>mp_unique&lt;L&gt;</code> returns a list of the same type as <code>L</code> with the duplicate elements removed.</p>
+<p><code>mp_unique&lt;L&gt;</code> returns a list of the same form as <code>L</code> with the duplicate elements removed.</p>
 </div>
 </div>
 <div class="sect3">
@@ -3615,7 +3631,7 @@ using R1 = mp_fold&lt;L1, std::ratio&lt;0,1&gt;, std::ratio_add&gt;; // std::rat
 <p>Returns <code>std::forward&lt;F&gt;(f)</code>.</p>
 </div>
 <div class="listingblock">
-<div class="title">Code Example 61. Using mp_for_each and a C++14 lambda to print a tuple</div>
+<div class="title">Code Example 62. Using mp_for_each and a C++14 lambda to print a tuple</div>
 <div class="content">
 <pre class="highlight"><code>template&lt;class... T&gt; void print( std::tuple&lt;T...&gt; const &amp; tp )
 {
@@ -3656,7 +3672,7 @@ Only <code>constexpr</code> on C++14 and higher.</p>
 <p>Returns <code>mp_with_index&lt;N::value&gt;(i, f)</code>.</p>
 </div>
 <div class="listingblock">
-<div class="title">Code Example 62. Using mp_with_index and a C++14 lambda to print the active element of a variant</div>
+<div class="title">Code Example 63. Using mp_with_index and a C++14 lambda to print the active element of a variant</div>
 <div class="content">
 <pre class="highlight"><code>template&lt;class... T&gt; void print( std::variant&lt;T...&gt; const&amp; v )
 {
@@ -3797,7 +3813,7 @@ replaces the existing element with <code>T</code>.</p>
 replaces the existing element <code>L&lt;X, Y&#8230;&#8203;&gt;</code> with <code>L&lt;X, F&lt;X, Y&#8230;&#8203;&gt;&gt;</code>.</p>
 </div>
 <div class="listingblock">
-<div class="title">Code Example 63. Using mp_map_update to count the number of occurences of types in a list</div>
+<div class="title">Code Example 64. Using mp_map_update to count the number of occurrences of types in a list</div>
 <div class="content">
 <pre class="highlight"><code>template&lt;class T, class U&gt; using inc2nd = mp_int&lt;U::value + 1&gt;;
 
@@ -3872,7 +3888,7 @@ returns <code>mp_false</code>. If the application causes a substitution failure,
 returns <code>mp_true</code>. <code>mp_and&lt;&gt;</code> is <code>mp_true</code>.</p>
 </div>
 <div class="listingblock">
-<div class="title">Code Example 64. mp_and behavior</div>
+<div class="title">Code Example 65. mp_and behavior</div>
 <div class="content">
 <pre class="highlight"><code>using R1 = mp_and&lt;mp_true, mp_true&gt;;   // mp_true
 
@@ -3898,7 +3914,7 @@ is an error because <code>void</code> does not have a nested <code>value</code>.
 mask substitution failures as <code>mp_and</code> does.</p>
 </div>
 <div class="listingblock">
-<div class="title">Code Example 65. mp_all behavior</div>
+<div class="title">Code Example 66. mp_all behavior</div>
 <div class="content">
 <pre class="highlight"><code>using R1 = mp_all&lt;mp_true, mp_true&gt;;   // mp_true
 
@@ -3922,7 +3938,7 @@ using R4 = mp_all&lt;void, mp_true&gt;;      // compile-time error</code></pre>
 returns <code>mp_true</code>. If all results are <code>mp_false</code>, returns <code>mp_false</code>. <code>mp_or&lt;&gt;</code> is <code>mp_false</code>.</p>
 </div>
 <div class="listingblock">
-<div class="title">Code Example 66. mp_or behavior</div>
+<div class="title">Code Example 67. mp_or behavior</div>
 <div class="content">
 <pre class="highlight"><code>using R1 = mp_or&lt;mp_true, mp_false&gt;;   // mp_true
 
@@ -3946,7 +3962,7 @@ using R4 = mp_or&lt;void, mp_true&gt;;       // compile-time error</code></pre>
 <code>mp_or</code>, but does not perform short-circuit evaluation.</p>
 </div>
 <div class="listingblock">
-<div class="title">Code Example 67. mp_any behavior</div>
+<div class="title">Code Example 68. mp_any behavior</div>
 <div class="content">
 <pre class="highlight"><code>using R1 = mp_any&lt;mp_true, mp_false&gt;;  // mp_true
 
@@ -4288,7 +4304,7 @@ into this documentation by Glen Fernandes.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-12-13 23:56:45 UTC
+Last updated 2018-04-11 13:49:06 UTC
 </div>
 </div>
 <style>

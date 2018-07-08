@@ -7,8 +7,8 @@
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="../../index.html" title="The Boost C++ Libraries BoostBook Documentation Subset">
 <link rel="up" href="../../interprocess/indexes_reference.html#header.boost.interprocess.smart_ptr.scoped_ptr_hpp" title="Header &lt;boost/interprocess/smart_ptr/scoped_ptr.hpp&gt;">
-<link rel="prev" href="to_raw_pointer_idp63266240.html" title="Function template to_raw_pointer">
-<link rel="next" href="swap_idp63306816.html" title="Function template swap">
+<link rel="prev" href="to_raw_pointer_idp38094160.html" title="Function template to_raw_pointer">
+<link rel="next" href="swap_idp38134736.html" title="Function template swap">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -21,7 +21,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="to_raw_pointer_idp63266240.html"><img src="../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../interprocess/indexes_reference.html#header.boost.interprocess.smart_ptr.scoped_ptr_hpp"><img src="../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="swap_idp63306816.html"><img src="../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="to_raw_pointer_idp38094160.html"><img src="../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../interprocess/indexes_reference.html#header.boost.interprocess.smart_ptr.scoped_ptr_hpp"><img src="../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="swap_idp38134736.html"><img src="../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="refentry">
 <a name="boost.interprocess.scoped_ptr"></a><div class="titlepage"></div>
@@ -42,21 +42,21 @@
   <span class="keyword">typedef</span> <span class="identifier">pointer</span> <span class="identifier">this_type</span><span class="special">::</span><span class="special">*</span> <a name="boost.interprocess.scoped_ptr.unspecified_bool_type"></a><span class="identifier">unspecified_bool_type</span><span class="special">;</span>
 
   <span class="comment">// <a class="link" href="scoped_ptr.html#boost.interprocess.scoped_ptrconstruct-copy-destruct">construct/copy/destruct</a></span>
-  <span class="keyword">explicit</span> <a class="link" href="scoped_ptr.html#idp63302096-bb"><span class="identifier">scoped_ptr</span></a><span class="special">(</span><span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span> <span class="special">=</span> <span class="number">0</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Deleter</span> <span class="special">&amp;</span> <span class="special">=</span> <span class="identifier">Deleter</span><span class="special">(</span><span class="special">)</span><span class="special">)</span><span class="special">;</span>
-  <a class="link" href="scoped_ptr.html#idp63305808-bb"><span class="special">~</span><span class="identifier">scoped_ptr</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">explicit</span> <a class="link" href="scoped_ptr.html#idp38130016-bb"><span class="identifier">scoped_ptr</span></a><span class="special">(</span><span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span> <span class="special">=</span> <span class="number">0</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Deleter</span> <span class="special">&amp;</span> <span class="special">=</span> <span class="identifier">Deleter</span><span class="special">(</span><span class="special">)</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="scoped_ptr.html#idp38133728-bb"><span class="special">~</span><span class="identifier">scoped_ptr</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
 
-  <span class="comment">// <a class="link" href="scoped_ptr.html#idp63281536-bb">public member functions</a></span>
-  <span class="keyword">void</span> <a class="link" href="scoped_ptr.html#idp63282096-bb"><span class="identifier">reset</span></a><span class="special">(</span><span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span> <span class="special">=</span> <span class="number">0</span><span class="special">)</span><span class="special">;</span>
-  <span class="keyword">void</span> <a class="link" href="scoped_ptr.html#idp63284416-bb"><span class="identifier">reset</span></a><span class="special">(</span><span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Deleter</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
-  <span class="identifier">pointer</span> <a class="link" href="scoped_ptr.html#idp63287136-bb"><span class="identifier">release</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
-  <span class="identifier">reference</span> <a class="link" href="scoped_ptr.html#idp63288480-bb"><span class="keyword">operator</span><span class="special">*</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
-  <span class="identifier">pointer</span> <span class="special">&amp;</span> <a class="link" href="scoped_ptr.html#idp63290080-bb"><span class="keyword">operator</span><span class="special">-&gt;</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
-  <span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span> <a class="link" href="scoped_ptr.html#idp63291376-bb"><span class="keyword">operator</span><span class="special">-&gt;</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
-  <span class="identifier">pointer</span> <span class="special">&amp;</span> <a class="link" href="scoped_ptr.html#idp63292944-bb"><span class="identifier">get</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
-  <span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span> <a class="link" href="scoped_ptr.html#idp63294240-bb"><span class="identifier">get</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
-  <a class="link" href="scoped_ptr.html#idp63295808-bb"><span class="keyword">operator</span> <span class="identifier">unspecified_bool_type</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
-  <span class="keyword">bool</span> <a class="link" href="scoped_ptr.html#idp63297360-bb"><span class="keyword">operator</span><span class="special">!</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
-  <span class="keyword">void</span> <a class="link" href="scoped_ptr.html#idp63298928-bb"><span class="identifier">swap</span></a><span class="special">(</span><a class="link" href="scoped_ptr.html" title="Class template scoped_ptr">scoped_ptr</a> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
+  <span class="comment">// <a class="link" href="scoped_ptr.html#idp38109456-bb">public member functions</a></span>
+  <span class="keyword">void</span> <a class="link" href="scoped_ptr.html#idp38110016-bb"><span class="identifier">reset</span></a><span class="special">(</span><span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span> <span class="special">=</span> <span class="number">0</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">void</span> <a class="link" href="scoped_ptr.html#idp38112336-bb"><span class="identifier">reset</span></a><span class="special">(</span><span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Deleter</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
+  <span class="identifier">pointer</span> <a class="link" href="scoped_ptr.html#idp38115056-bb"><span class="identifier">release</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <span class="identifier">reference</span> <a class="link" href="scoped_ptr.html#idp38116400-bb"><span class="keyword">operator</span><span class="special">*</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="identifier">pointer</span> <span class="special">&amp;</span> <a class="link" href="scoped_ptr.html#idp38118000-bb"><span class="keyword">operator</span><span class="special">-&gt;</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span> <a class="link" href="scoped_ptr.html#idp38119296-bb"><span class="keyword">operator</span><span class="special">-&gt;</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="identifier">pointer</span> <span class="special">&amp;</span> <a class="link" href="scoped_ptr.html#idp38120864-bb"><span class="identifier">get</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span> <a class="link" href="scoped_ptr.html#idp38122160-bb"><span class="identifier">get</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <a class="link" href="scoped_ptr.html#idp38123728-bb"><span class="keyword">operator</span> <span class="identifier">unspecified_bool_type</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="keyword">bool</span> <a class="link" href="scoped_ptr.html#idp38125280-bb"><span class="keyword">operator</span><span class="special">!</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="keyword">void</span> <a class="link" href="scoped_ptr.html#idp38126848-bb"><span class="identifier">swap</span></a><span class="special">(</span><a class="link" href="scoped_ptr.html" title="Class template scoped_ptr">scoped_ptr</a> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
 <span class="special">}</span><span class="special">;</span></pre></div>
 <div class="refsect1">
 <a name="id-1.3.18.17.3.51.4.4"></a><h2>Description</h2>
@@ -68,61 +68,61 @@
        construct/copy/destruct</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">explicit</span> <a name="idp63302096-bb"></a><span class="identifier">scoped_ptr</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span> p <span class="special">=</span> <span class="number">0</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Deleter</span> <span class="special">&amp;</span> d <span class="special">=</span> <span class="identifier">Deleter</span><span class="special">(</span><span class="special">)</span><span class="special">)</span><span class="special">;</span></pre>
+<pre class="literallayout"><span class="keyword">explicit</span> <a name="idp38130016-bb"></a><span class="identifier">scoped_ptr</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span> p <span class="special">=</span> <span class="number">0</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Deleter</span> <span class="special">&amp;</span> d <span class="special">=</span> <span class="identifier">Deleter</span><span class="special">(</span><span class="special">)</span><span class="special">)</span><span class="special">;</span></pre>
 <p>Constructs a <code class="computeroutput"><a class="link" href="scoped_ptr.html" title="Class template scoped_ptr">scoped_ptr</a></code>, storing a copy of p(which can be 0) and d. Does not throw. </p>
 </li>
 <li class="listitem">
-<pre class="literallayout"><a name="idp63305808-bb"></a><span class="special">~</span><span class="identifier">scoped_ptr</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
+<pre class="literallayout"><a name="idp38133728-bb"></a><span class="special">~</span><span class="identifier">scoped_ptr</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
 <p>If the stored pointer is not 0, destroys the object pointed to by the stored pointer. calling the operator() of the stored deleter. Never throws </p>
 </li>
 </ol></div>
 </div>
 <div class="refsect2">
 <a name="id-1.3.18.17.3.51.4.4.4"></a><h3>
-<a name="idp63281536-bb"></a><code class="computeroutput">scoped_ptr</code> public member functions</h3>
+<a name="idp38109456-bb"></a><code class="computeroutput">scoped_ptr</code> public member functions</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">void</span> <a name="idp63282096-bb"></a><span class="identifier">reset</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span> p <span class="special">=</span> <span class="number">0</span><span class="special">)</span><span class="special">;</span></pre>
+<pre class="literallayout"><span class="keyword">void</span> <a name="idp38110016-bb"></a><span class="identifier">reset</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span> p <span class="special">=</span> <span class="number">0</span><span class="special">)</span><span class="special">;</span></pre>
 <p>Deletes the object pointed to by the stored pointer and then stores a copy of p. Never throws </p>
 </li>
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">void</span> <a name="idp63284416-bb"></a><span class="identifier">reset</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span> p<span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Deleter</span> <span class="special">&amp;</span> d<span class="special">)</span><span class="special">;</span></pre>
+<pre class="literallayout"><span class="keyword">void</span> <a name="idp38112336-bb"></a><span class="identifier">reset</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span> p<span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Deleter</span> <span class="special">&amp;</span> d<span class="special">)</span><span class="special">;</span></pre>
 <p>Deletes the object pointed to by the stored pointer and then stores a copy of p and a copy of d. </p>
 </li>
 <li class="listitem">
-<pre class="literallayout"><span class="identifier">pointer</span> <a name="idp63287136-bb"></a><span class="identifier">release</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
+<pre class="literallayout"><span class="identifier">pointer</span> <a name="idp38115056-bb"></a><span class="identifier">release</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
 <p>Assigns internal pointer as 0 and returns previous pointer. This will avoid deletion on destructor </p>
 </li>
 <li class="listitem">
-<pre class="literallayout"><span class="identifier">reference</span> <a name="idp63288480-bb"></a><span class="keyword">operator</span><span class="special">*</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
+<pre class="literallayout"><span class="identifier">reference</span> <a name="idp38116400-bb"></a><span class="keyword">operator</span><span class="special">*</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
 <p>Returns a reference to the object pointed to by the stored pointer. Never throws. </p>
 </li>
 <li class="listitem">
-<pre class="literallayout"><span class="identifier">pointer</span> <span class="special">&amp;</span> <a name="idp63290080-bb"></a><span class="keyword">operator</span><span class="special">-&gt;</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
+<pre class="literallayout"><span class="identifier">pointer</span> <span class="special">&amp;</span> <a name="idp38118000-bb"></a><span class="keyword">operator</span><span class="special">-&gt;</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
 <p>Returns the internal stored pointer. Never throws. </p>
 </li>
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span> <a name="idp63291376-bb"></a><span class="keyword">operator</span><span class="special">-&gt;</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
+<pre class="literallayout"><span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span> <a name="idp38119296-bb"></a><span class="keyword">operator</span><span class="special">-&gt;</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
 <p>Returns the internal stored pointer. Never throws. </p>
 </li>
 <li class="listitem">
-<pre class="literallayout"><span class="identifier">pointer</span> <span class="special">&amp;</span> <a name="idp63292944-bb"></a><span class="identifier">get</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
+<pre class="literallayout"><span class="identifier">pointer</span> <span class="special">&amp;</span> <a name="idp38120864-bb"></a><span class="identifier">get</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
 <p>Returns the stored pointer. Never throws. </p>
 </li>
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span> <a name="idp63294240-bb"></a><span class="identifier">get</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
+<pre class="literallayout"><span class="keyword">const</span> <span class="identifier">pointer</span> <span class="special">&amp;</span> <a name="idp38122160-bb"></a><span class="identifier">get</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
 <p>Returns the stored pointer. Never throws. </p>
 </li>
 <li class="listitem">
-<pre class="literallayout"><a name="idp63295808-bb"></a><span class="keyword">operator</span> <span class="identifier">unspecified_bool_type</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
+<pre class="literallayout"><a name="idp38123728-bb"></a><span class="keyword">operator</span> <span class="identifier">unspecified_bool_type</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
 <p>Conversion to bool Never throws </p>
 </li>
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">bool</span> <a name="idp63297360-bb"></a><span class="keyword">operator</span><span class="special">!</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
+<pre class="literallayout"><span class="keyword">bool</span> <a name="idp38125280-bb"></a><span class="keyword">operator</span><span class="special">!</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
 <p>Returns true if the stored pointer is 0. Never throws. </p>
 </li>
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">void</span> <a name="idp63298928-bb"></a><span class="identifier">swap</span><span class="special">(</span><a class="link" href="scoped_ptr.html" title="Class template scoped_ptr">scoped_ptr</a> <span class="special">&amp;</span> b<span class="special">)</span><span class="special">;</span></pre>
+<pre class="literallayout"><span class="keyword">void</span> <a name="idp38126848-bb"></a><span class="identifier">swap</span><span class="special">(</span><a class="link" href="scoped_ptr.html" title="Class template scoped_ptr">scoped_ptr</a> <span class="special">&amp;</span> b<span class="special">)</span><span class="special">;</span></pre>
 <p>Exchanges the internal pointer and deleter with other <code class="computeroutput"><a class="link" href="scoped_ptr.html" title="Class template scoped_ptr">scoped_ptr</a></code> Never throws. </p>
 </li>
 </ol></div>
@@ -139,7 +139,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="to_raw_pointer_idp63266240.html"><img src="../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../interprocess/indexes_reference.html#header.boost.interprocess.smart_ptr.scoped_ptr_hpp"><img src="../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="swap_idp63306816.html"><img src="../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="to_raw_pointer_idp38094160.html"><img src="../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../interprocess/indexes_reference.html#header.boost.interprocess.smart_ptr.scoped_ptr_hpp"><img src="../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="swap_idp38134736.html"><img src="../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

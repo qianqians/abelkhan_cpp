@@ -1241,7 +1241,7 @@ References:<orderedlist>
 <data-member name="default_seed" specifiers="static"><type>const IntType</type></data-member>
 <method-group name="public member functions">
 <method name="seed"><type>void</type><description><para>Calls seed(default_seed) </para></description></method>
-<method name="seed"><type>void</type><parameter name="x0"><paramtype>IntType</paramtype></parameter><description><para>If c mod m is zero and x0 mod m is zero, changes the current value of the generator to 1. Otherwise, changes it to x0 mod m. If c is zero, distinct seeds in the range [1,m) will leave the generator in distinct states. If c is not zero, the range is [0,m). </para></description></method>
+<method name="seed"><type>void</type><parameter name="x0_"><paramtype>IntType</paramtype></parameter><description><para>If c mod m is zero and x0 mod m is zero, changes the current value of the generator to 1. Otherwise, changes it to x0 mod m. If c is zero, distinct seeds in the range [1,m) will leave the generator in distinct states. If c is not zero, the range is [0,m). </para></description></method>
 <method name="seed"><type>void</type><template>
           <template-type-parameter name="SeedSeq"/>
         </template><parameter name="seq"><paramtype>SeedSeq &amp;</paramtype></parameter><description><para>Seeds a <computeroutput><classname alt="boost::random::linear_congruential_engine">linear_congruential_engine</classname></computeroutput> using values from a SeedSeq. </para></description></method>

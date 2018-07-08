@@ -115,14 +115,20 @@
 <namespace name="lockfree">
 <class name="spsc_queue"><template>
       <template-type-parameter name="T"/>
-      <template-nontype-parameter name="Options"><type>typename...</type></template-nontype-parameter>
+      <template-type-parameter name="A0"/>
+      <template-type-parameter name="A1"/>
     </template><description><para>The <classname alt="boost::lockfree::spsc_queue">spsc_queue</classname> class provides a single-writer/single-reader fifo queue, pushing and popping is wait-free.</para><para><emphasis role="bold">Policies:</emphasis> <itemizedlist>
 <listitem><para><computeroutput>boost::lockfree::capacity&lt;&gt;</computeroutput>, optional <sbr/>
  If this template argument is passed to the options, the size of the ringbuffer is set at compile-time.</para></listitem><listitem><para><computeroutput>boost::lockfree::allocator&lt;&gt;</computeroutput>, defaults to <computeroutput><classname alt="boost::lockfree::allocator">boost::lockfree::allocator</classname>&lt;std::allocator&lt;T&gt;&gt;</computeroutput> <sbr/>
  Specifies the allocator that is used to allocate the ringbuffer. This option is only valid, if the ringbuffer is configured to be sized at run-time</para></listitem></itemizedlist>
 </para><para><emphasis role="bold">Requirements:</emphasis> <itemizedlist>
 <listitem><para>T must have a default constructor</para></listitem><listitem><para>T must be copyable </para></listitem></itemizedlist>
-</para></description><constructor><parameter name=""><paramtype>void</paramtype></parameter><description><para>Constructs a <classname alt="boost::lockfree::spsc_queue">spsc_queue</classname></para><para>
+</para></description><struct name="implementation_defined"><template>
+      <template-type-parameter name="T"/>
+      <template-nontype-parameter name="Options"><type>typename...</type></template-nontype-parameter>
+    </template><typedef name="allocator"><type>allocator_arg</type></typedef>
+<typedef name="size_type"><type>std::size_t</type></typedef>
+</struct><constructor><parameter name=""><paramtype>void</paramtype></parameter><description><para>Constructs a <classname alt="boost::lockfree::spsc_queue">spsc_queue</classname></para><para>
 </para></description><requires><para><classname alt="boost::lockfree::spsc_queue">spsc_queue</classname> must be configured to be sized at compile-time </para></requires></constructor>
 <constructor specifiers="explicit"><template>
           <template-type-parameter name="U"/>

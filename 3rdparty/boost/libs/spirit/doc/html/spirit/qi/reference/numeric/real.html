@@ -4,7 +4,7 @@
 <title>Real Number Parsers (float_, double_, etc.)</title>
 <link rel="stylesheet" href="../../../../../../../../doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
-<link rel="home" href="../../../../index.html" title="Spirit 2.5.4">
+<link rel="home" href="../../../../index.html" title="Spirit 2.5.5">
 <link rel="up" href="../numeric.html" title="Numeric Parsers">
 <link rel="prev" href="int.html" title="Signed Integer Parsers (int_, etc.)">
 <link rel="next" href="boolean.html" title="Boolean Parser (bool_)">
@@ -1097,10 +1097,19 @@
     <span class="comment">//  2 decimal places Max</span>
     <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">typename</span> <span class="identifier">Iterator</span><span class="special">,</span> <span class="keyword">typename</span> <span class="identifier">Attribute</span><span class="special">&gt;</span>
     <span class="keyword">static</span> <span class="keyword">bool</span>
-    <span class="identifier">parse_frac_n</span><span class="special">(</span><span class="identifier">Iterator</span><span class="special">&amp;</span> <span class="identifier">first</span><span class="special">,</span> <span class="identifier">Iterator</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">last</span><span class="special">,</span> <span class="identifier">Attribute</span><span class="special">&amp;</span> <span class="identifier">attr</span><span class="special">)</span>
+    <span class="identifier">parse_frac_n</span><span class="special">(</span><span class="identifier">Iterator</span><span class="special">&amp;</span> <span class="identifier">first</span><span class="special">,</span> <span class="identifier">Iterator</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">last</span><span class="special">,</span> <span class="identifier">Attribute</span><span class="special">&amp;</span> <span class="identifier">attr</span><span class="special">,</span>
+                 <span class="keyword">int</span><span class="special">&amp;</span> <span class="identifier">frac_digits</span><span class="special">)</span>
     <span class="special">{</span>
-        <span class="keyword">return</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">spirit</span><span class="special">::</span><span class="identifier">qi</span><span class="special">::</span>
+        <span class="identifier">Iterator</span> <span class="identifier">savef</span> <span class="special">=</span> <span class="identifier">first</span><span class="special">;</span>
+        <span class="keyword">bool</span> <span class="identifier">r</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">spirit</span><span class="special">::</span><span class="identifier">qi</span><span class="special">::</span>
             <span class="identifier">extract_uint</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">,</span> <span class="number">10</span><span class="special">,</span> <span class="number">1</span><span class="special">,</span> <span class="number">2</span><span class="special">,</span> <span class="keyword">true</span><span class="special">&gt;::</span><span class="identifier">call</span><span class="special">(</span><span class="identifier">first</span><span class="special">,</span> <span class="identifier">last</span><span class="special">,</span> <span class="identifier">attr</span><span class="special">);</span>
+        <span class="keyword">if</span> <span class="special">(</span><span class="identifier">r</span><span class="special">)</span> <span class="special">{</span>
+            <span class="comment">// Optimization note: don't compute frac_digits if T is</span>
+            <span class="comment">// an unused_type. This should be optimized away by the compiler.</span>
+            <span class="keyword">if</span> <span class="special">(!</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">is_same</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">spirit</span><span class="special">::</span><span class="identifier">unused_type</span><span class="special">&gt;::</span><span class="identifier">value</span><span class="special">)</span>
+                <span class="identifier">frac_digits</span> <span class="special">=</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">distance</span><span class="special">(</span><span class="identifier">savef</span><span class="special">,</span> <span class="identifier">first</span><span class="special">));</span>
+        <span class="special">}</span>
+        <span class="keyword">return</span> <span class="identifier">r</span><span class="special">;</span>
     <span class="special">}</span>
 
     <span class="comment">//  No exponent</span>

@@ -27,7 +27,7 @@
 <a name="beast.ref.boost__beast__websocket__stream.set_option"></a><a class="link" href="set_option.html" title="websocket::stream::set_option">websocket::stream::set_option</a>
 </h5></div></div></div>
 <p>
-          <a class="indexterm" name="idp143539280"></a>
+          <a class="indexterm" name="idp129268848"></a>
 Set the permessage-deflate extension options.
         </p>
 <h6>
@@ -42,6 +42,44 @@ Set the permessage-deflate extension options.
 <a name="beast.ref.boost__beast__websocket__stream.set_option.h1"></a>
           <span class="phrase"><a name="beast.ref.boost__beast__websocket__stream.set_option.description"></a></span><a class="link" href="set_option.html#beast.ref.boost__beast__websocket__stream.set_option.description">Description</a>
         </h6>
+<h6>
+<a name="beast.ref.boost__beast__websocket__stream.set_option.h2"></a>
+          <span class="phrase"><a name="beast.ref.boost__beast__websocket__stream.set_option.exceptions"></a></span><a class="link" href="set_option.html#beast.ref.boost__beast__websocket__stream.set_option.exceptions">Exceptions</a>
+        </h6>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Type
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Thrown On
+                  </p>
+                </th>
+</tr></thead>
+<tbody><tr>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="identifier">invalid_argument</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    if <code class="computeroutput"><span class="identifier">deflateSupported</span>
+                    <span class="special">==</span> <span class="keyword">false</span></code>,
+                    and either <code class="computeroutput"><span class="identifier">client_enable</span></code>
+                    or <code class="computeroutput"><span class="identifier">server_enable</span></code>
+                    is <code class="computeroutput"><span class="keyword">true</span></code>.
+                  </p>
+                </td>
+</tr></tbody>
+</table></div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>

@@ -37,7 +37,8 @@
         Defined in header <code class="literal">&lt;<a href="../../../../../../boost/beast/websocket/stream.hpp" target="_top">boost/beast/websocket/stream.hpp</a>&gt;</code>
       </p>
 <pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span>
-    <span class="keyword">class</span> <span class="identifier">NextLayer</span><span class="special">&gt;</span>
+    <span class="keyword">class</span> <span class="identifier">NextLayer</span><span class="special">,</span>
+    <span class="keyword">bool</span> <span class="identifier">deflateSupported</span><span class="special">&gt;</span>
 <span class="keyword">class</span> <span class="identifier">stream</span>
 </pre>
 <h5>
@@ -71,6 +72,18 @@
 <td>
                 <p>
                   The type of the executor associated with the object.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <a class="link" href="boost__beast__websocket__stream/is_deflate_supported.html" title="websocket::stream::is_deflate_supported"><span class="bold"><strong>is_deflate_supported</strong></span></a>
+                </p>
+              </td>
+<td>
+                <p>
+                  Indicates if the permessage-deflate extension is supported.
                 </p>
               </td>
 </tr>
@@ -720,7 +733,8 @@
                 </p>
               </th>
 </tr></thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>
                 <p>
                   <code class="computeroutput"><span class="identifier">NextLayer</span></code>
@@ -734,7 +748,24 @@
                   the type must support the AsyncStream concept.
                 </p>
               </td>
-</tr></tbody>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">deflateSupported</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  A <code class="computeroutput"><span class="keyword">bool</span></code> indicating
+                  whether or not the stream will be capable of negotiating the permessage-deflate
+                  websocket extension. Note that even if this is set to <code class="computeroutput"><span class="keyword">true</span></code>, the permessage deflate options
+                  (set by the caller at runtime) must still have the feature enabled
+                  for a successful negotiation to occur.
+                </p>
+              </td>
+</tr>
+</tbody>
 </table></div>
 <h5>
 <a name="beast.ref.boost__beast__websocket__stream.h7"></a>

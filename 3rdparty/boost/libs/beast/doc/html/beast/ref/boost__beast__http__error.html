@@ -27,7 +27,7 @@
 <a name="beast.ref.boost__beast__http__error"></a><a class="link" href="boost__beast__http__error.html" title="http::error">http::error</a>
 </h4></div></div></div>
 <p>
-        <a class="indexterm" name="idp118701920"></a>
+        <a class="indexterm" name="idp104524448"></a>
 Error codes returned from HTTP algorithms and operations.
       </p>
 <h5>
@@ -40,29 +40,29 @@ Error codes returned from HTTP algorithms and operations.
 <pre class="programlisting"><span class="keyword">enum</span> <span class="identifier">error</span>
 </pre>
 <p>
-        <a class="indexterm" name="idp118709776"></a>
- <a class="indexterm" name="idp118710880"></a>
- <a class="indexterm" name="idp118711984"></a>
- <a class="indexterm" name="idp118713088"></a>
- <a class="indexterm" name="idp118714192"></a>
- <a class="indexterm" name="idp118715296"></a>
- <a class="indexterm" name="idp118716400"></a>
- <a class="indexterm" name="idp118717504"></a>
- <a class="indexterm" name="idp118718608"></a>
- <a class="indexterm" name="idp118719712"></a>
- <a class="indexterm" name="idp118720816"></a>
- <a class="indexterm" name="idp118721920"></a>
- <a class="indexterm" name="idp118723024"></a>
- <a class="indexterm" name="idp118724128"></a>
- <a class="indexterm" name="idp118725232"></a>
- <a class="indexterm" name="idp118726336"></a>
- <a class="indexterm" name="idp118727440"></a>
- <a class="indexterm" name="idp118728544"></a>
- <a class="indexterm" name="idp118729648"></a>
- <a class="indexterm" name="idp118730752"></a>
- <a class="indexterm" name="idp118731856"></a>
- <a class="indexterm" name="idp118732960"></a>
- <a class="indexterm" name="idp118734064"></a>
+        <a class="indexterm" name="idp104532432"></a>
+ <a class="indexterm" name="idp104533536"></a>
+ <a class="indexterm" name="idp104534640"></a>
+ <a class="indexterm" name="idp104535744"></a>
+ <a class="indexterm" name="idp104536848"></a>
+ <a class="indexterm" name="idp104537952"></a>
+ <a class="indexterm" name="idp104539056"></a>
+ <a class="indexterm" name="idp104540160"></a>
+ <a class="indexterm" name="idp104541264"></a>
+ <a class="indexterm" name="idp104542368"></a>
+ <a class="indexterm" name="idp104543472"></a>
+ <a class="indexterm" name="idp104544576"></a>
+ <a class="indexterm" name="idp104545680"></a>
+ <a class="indexterm" name="idp104546784"></a>
+ <a class="indexterm" name="idp104547888"></a>
+ <a class="indexterm" name="idp104548992"></a>
+ <a class="indexterm" name="idp104550096"></a>
+ <a class="indexterm" name="idp104551200"></a>
+ <a class="indexterm" name="idp104552304"></a>
+ <a class="indexterm" name="idp104553408"></a>
+ <a class="indexterm" name="idp104554512"></a>
+ <a class="indexterm" name="idp104555616"></a>
+ <a class="indexterm" name="idp104556720"></a>
 
       </p>
 <h5>
@@ -98,12 +98,9 @@ Error codes returned from HTTP algorithms and operations.
                   The end of the stream was reached.
                 </p>
                 <p>
-                  This error is returned under the following conditions:When attempting
-                  to read HTTP data from a stream and the stream read returns the
-                  error boost::asio::error::eof before any new octets have been received.
-                  When sending a complete HTTP message at once and the semantics
-                  of the message are that the connection should be closed to indicate
-                  the end of the message.
+                  This error is returned when attempting to read HTTP data, and the
+                  stream returns the error boost::asio::error::eof before any octets
+                  corresponding to a new HTTP message have been received.
                 </p>
               </td>
 </tr>

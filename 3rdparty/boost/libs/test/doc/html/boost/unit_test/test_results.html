@@ -35,18 +35,18 @@
 <span class="keyword">class</span> <a class="link" href="test_results.html" title="Class test_results">test_results</a> <span class="special">{</span>
 <span class="keyword">public</span><span class="special">:</span>
   <span class="comment">// <a class="link" href="test_results.html#boost.unit_test.test_resultsconstruct-copy-destruct">construct/copy/destruct</a></span>
-  <a class="link" href="test_results.html#idp52408096-bb"><span class="identifier">test_results</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="test_results.html#idp53644384-bb"><span class="identifier">test_results</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
 
-  <span class="comment">// <a class="link" href="test_results.html#idp52387520-bb">public member functions</a></span>
-  <span class="keyword">typedef</span> <a class="link" href="test_results.html#idp52388080-bb"><span class="identifier">BOOST_READONLY_PROPERTY</span></a><span class="special">(</span><span class="identifier">counter_t</span><span class="special">,</span> 
+  <span class="comment">// <a class="link" href="test_results.html#idp53623808-bb">public member functions</a></span>
+  <span class="keyword">typedef</span> <a class="link" href="test_results.html#idp53624368-bb"><span class="identifier">BOOST_READONLY_PROPERTY</span></a><span class="special">(</span><span class="identifier">counter_t</span><span class="special">,</span> 
                                   <span class="special">(</span><a class="link" href="results_collector_t.html" title="Class results_collector_t">results_collector_t</a><span class="special">)</span><span class="special">(</span><a class="link" href="test_results.html" title="Class test_results">test_results</a><span class="special">)</span><span class="special">(</span><span class="identifier">results_collect_helper</span><span class="special">)</span><span class="special">)</span><span class="special">;</span>
-  <span class="keyword">typedef</span> <a class="link" href="test_results.html#idp52391536-bb"><span class="identifier">BOOST_READONLY_PROPERTY</span></a><span class="special">(</span><span class="keyword">bool</span><span class="special">,</span> 
+  <span class="keyword">typedef</span> <a class="link" href="test_results.html#idp53627824-bb"><span class="identifier">BOOST_READONLY_PROPERTY</span></a><span class="special">(</span><span class="keyword">bool</span><span class="special">,</span> 
                                   <span class="special">(</span><a class="link" href="results_collector_t.html" title="Class results_collector_t">results_collector_t</a><span class="special">)</span><span class="special">(</span><a class="link" href="test_results.html" title="Class test_results">test_results</a><span class="special">)</span><span class="special">(</span><span class="identifier">results_collect_helper</span><span class="special">)</span><span class="special">)</span><span class="special">;</span>
-  <span class="keyword">bool</span> <a class="link" href="test_results.html#idp52394992-bb"><span class="identifier">passed</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
-  <span class="keyword">bool</span> <a class="link" href="test_results.html#idp52396416-bb"><span class="identifier">aborted</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
-  <span class="keyword">int</span> <a class="link" href="test_results.html#idp52397872-bb"><span class="identifier">result_code</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
-  <span class="keyword">void</span> <a class="link" href="test_results.html#idp52403280-bb"><span class="keyword">operator</span><span class="special">+=</span></a><span class="special">(</span><a class="link" href="test_results.html" title="Class test_results">test_results</a> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
-  <span class="keyword">void</span> <a class="link" href="test_results.html#idp52406768-bb"><span class="identifier">clear</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">bool</span> <a class="link" href="test_results.html#idp53631280-bb"><span class="identifier">passed</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="keyword">bool</span> <a class="link" href="test_results.html#idp53632704-bb"><span class="identifier">aborted</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="keyword">int</span> <a class="link" href="test_results.html#idp53634160-bb"><span class="identifier">result_code</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="keyword">void</span> <a class="link" href="test_results.html#idp53639568-bb"><span class="keyword">operator</span><span class="special">+=</span></a><span class="special">(</span><a class="link" href="test_results.html" title="Class test_results">test_results</a> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">void</span> <a class="link" href="test_results.html#idp53643056-bb"><span class="identifier">clear</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
 
   <span class="comment">// public data members</span>
   <span class="identifier">counter_prop</span> <span class="identifier">p_assertions_passed</span><span class="special">;</span>  <span class="comment">// Number of successful assertions. </span>
@@ -63,32 +63,32 @@
   <span class="identifier">bool_prop</span> <span class="identifier">p_skipped</span><span class="special">;</span>  <span class="comment">// Indicates that the test unit execution has been skipped. </span>
 <span class="special">}</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idp114929904"></a><h2>Description</h2>
+<a name="idp132733408"></a><h2>Description</h2>
 <p>This class is a collection of attributes describing a test result.</p>
 <p>The attributes presented as public properties on an instance of the class. In addition summary conclusion methods are presented to generate simple answer to pass/fail question </p>
 <div class="refsect2">
-<a name="idp114931104"></a><h3>
+<a name="idp132734608"></a><h3>
 <a name="boost.unit_test.test_resultsconstruct-copy-destruct"></a><code class="computeroutput">test_results</code> 
         public
        construct/copy/destruct</h3>
-<div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><pre class="literallayout"><a name="idp52408096-bb"></a><span class="identifier">test_results</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre></li></ol></div>
+<div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><pre class="literallayout"><a name="idp53644384-bb"></a><span class="identifier">test_results</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre></li></ol></div>
 </div>
 <div class="refsect2">
-<a name="idp114937040"></a><h3>
-<a name="idp52387520-bb"></a><code class="computeroutput">test_results</code> public member functions</h3>
+<a name="idp132740416"></a><h3>
+<a name="idp53623808-bb"></a><code class="computeroutput">test_results</code> public member functions</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">typedef</span> <a name="idp52388080-bb"></a><span class="identifier">BOOST_READONLY_PROPERTY</span><span class="special">(</span><span class="identifier">counter_t</span><span class="special">,</span> 
+<pre class="literallayout"><span class="keyword">typedef</span> <a name="idp53624368-bb"></a><span class="identifier">BOOST_READONLY_PROPERTY</span><span class="special">(</span><span class="identifier">counter_t</span><span class="special">,</span> 
                                 <span class="special">(</span><a class="link" href="results_collector_t.html" title="Class results_collector_t">results_collector_t</a><span class="special">)</span><span class="special">(</span><a class="link" href="test_results.html" title="Class test_results">test_results</a><span class="special">)</span><span class="special">(</span><span class="identifier">results_collect_helper</span><span class="special">)</span><span class="special">)</span><span class="special">;</span></pre>Type representing counter like public property. </li>
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">typedef</span> <a name="idp52391536-bb"></a><span class="identifier">BOOST_READONLY_PROPERTY</span><span class="special">(</span><span class="keyword">bool</span><span class="special">,</span> 
+<pre class="literallayout"><span class="keyword">typedef</span> <a name="idp53627824-bb"></a><span class="identifier">BOOST_READONLY_PROPERTY</span><span class="special">(</span><span class="keyword">bool</span><span class="special">,</span> 
                                 <span class="special">(</span><a class="link" href="results_collector_t.html" title="Class results_collector_t">results_collector_t</a><span class="special">)</span><span class="special">(</span><a class="link" href="test_results.html" title="Class test_results">test_results</a><span class="special">)</span><span class="special">(</span><span class="identifier">results_collect_helper</span><span class="special">)</span><span class="special">)</span><span class="special">;</span></pre>Type representing boolean like public property. </li>
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">bool</span> <a name="idp52394992-bb"></a><span class="identifier">passed</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>Returns true if test unit passed. </li>
+<pre class="literallayout"><span class="keyword">bool</span> <a name="idp53631280-bb"></a><span class="identifier">passed</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>Returns true if test unit passed. </li>
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">bool</span> <a name="idp52396416-bb"></a><span class="identifier">aborted</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>Returns true if the test unit was aborted (hard failure) </li>
+<pre class="literallayout"><span class="keyword">bool</span> <a name="idp53632704-bb"></a><span class="identifier">aborted</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>Returns true if the test unit was aborted (hard failure) </li>
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">int</span> <a name="idp52397872-bb"></a><span class="identifier">result_code</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>Produces result code for the test unit execution. <p>This methhod return one of the result codes defined in <code class="computeroutput">boost/cstdlib.hpp</code> 
+<pre class="literallayout"><span class="keyword">int</span> <a name="idp53634160-bb"></a><span class="identifier">result_code</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>Produces result code for the test unit execution. <p>This methhod return one of the result codes defined in <code class="computeroutput">boost/cstdlib.hpp</code> 
 </p>
 <div class="variablelist"><table border="0" class="variablelist compact">
 <colgroup>
@@ -110,17 +110,17 @@
 </table></div>
 </li>
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">void</span> <a name="idp52403280-bb"></a><span class="keyword">operator</span><span class="special">+=</span><span class="special">(</span><a class="link" href="test_results.html" title="Class test_results">test_results</a> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span></pre>Combines the results of the current instance with another. <p>Only the counters are updated and the <code class="computeroutput">p_aborted</code> and <code class="computeroutput">p_skipped</code> are left unchanged. </p>
+<pre class="literallayout"><span class="keyword">void</span> <a name="idp53639568-bb"></a><span class="keyword">operator</span><span class="special">+=</span><span class="special">(</span><a class="link" href="test_results.html" title="Class test_results">test_results</a> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span></pre>Combines the results of the current instance with another. <p>Only the counters are updated and the <code class="computeroutput">p_aborted</code> and <code class="computeroutput">p_skipped</code> are left unchanged. </p>
 </li>
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">void</span> <a name="idp52406768-bb"></a><span class="identifier">clear</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>Resets the current state of the result. </li>
+<pre class="literallayout"><span class="keyword">void</span> <a name="idp53643056-bb"></a><span class="identifier">clear</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>Resets the current state of the result. </li>
 </ol></div>
 </div>
 </div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2001-2017 Boost.Test contributors<p>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2001-2018 Boost.Test contributors<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

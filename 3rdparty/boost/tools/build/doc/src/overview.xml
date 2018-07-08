@@ -449,6 +449,8 @@ actions create-file-from-another
       </tgroup>
     </table>
 
+    <para>Any of these files may also be overridden <link linkend="bbv2.reference.init.options.config">on the command line</link></para>
+
     <tip>
       <para>
         You can use the <command>--debug-configuration</command> option to
@@ -785,6 +787,38 @@ b2 toolset=gcc variant=debug optimization=space
             </listitem>
           </varlistentry>
 
+          <varlistentry id="bbv2.reference.init.options.config">
+            <term><option>--config=<replaceable>filename</replaceable></option></term>
+            <listitem>
+              <indexterm><primary>config</primary></indexterm>
+              <para>Override all <link linkend="bbv2.overview.configuration">configuration files</link></para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><option>--site-config=<replaceable>filename</replaceable></option></term>
+            <listitem>
+              <indexterm><primary>site-config.jam</primary></indexterm>
+              <para>Override the default <link linkend="bbv2.overview.configuration">site-config.jam</link></para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><option>--user-config=<replaceable>filename</replaceable></option></term>
+            <listitem>
+              <indexterm><primary>user-config.jam</primary></indexterm>
+              <para>Override the default <link linkend="bbv2.overview.configuration">user-config.jam</link></para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><option>--project-config=<replaceable>filename</replaceable></option></term>
+            <listitem>
+              <indexterm><primary>project-config.jam</primary></indexterm>
+              <para>Override the default <link linkend="bbv2.overview.configuration">project-config.jam</link></para>
+            </listitem>
+          </varlistentry>
+
           <varlistentry>
             <term><option>--debug-configuration</option></term>
             <listitem>
@@ -1020,6 +1054,12 @@ b2 link=static,shared threading=single,multi
 b2 include=static,shared
 </screen>
         <para>is not treated specially.</para>
+
+        <para>Multiple features may be grouped by using a forwards slash.</para>
+<screen>
+b2 gcc/link=shared msvc/link=static,shared
+</screen>
+        <para>This will build 3 different variants, altogether.</para>
 
       </section>
 

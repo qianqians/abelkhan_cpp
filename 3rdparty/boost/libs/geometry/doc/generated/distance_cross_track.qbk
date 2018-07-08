@@ -63,6 +63,14 @@ class strategy::distance::cross_track
 [heading Member Function(s)]
 [table
 [[Function] [Description] [Parameters]  [Returns]]
+[[``Strategy get_distance_strategy()``
+
+] [] [
+
+][
+
+]
+]
 [[``template<typename Point, typename PointOfSegment>
 return_type< Point, PointOfSegment >::type apply(Point const & p, PointOfSegment const & sp1, PointOfSegment const & sp2)``
 

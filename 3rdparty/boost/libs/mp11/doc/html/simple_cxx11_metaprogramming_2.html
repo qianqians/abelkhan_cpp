@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.6.1">
+<meta name="generator" content="Asciidoctor 1.5.6.2">
 <meta name="author" content="Peter Dimov">
 <title>Simple C++11 metaprogramming, part 2</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
@@ -2008,7 +2008,7 @@ as the first argument are:</p>
 </tbody>
 </table>
 <div class="paragraph">
-<p>To improve upon this apalling result, we&#8217;ll again exploit pack expansion into a
+<p>To improve upon this appalling result, we&#8217;ll again exploit pack expansion into a
 function call, but in a novel way. Let&#8217;s suppose that we need to access the
 fourth element (<code>I = 3</code>). We&#8217;ll generate the function signature</p>
 </div>
@@ -2311,7 +2311,7 @@ one. We can pretty much tell who&#8217;s going to win, and by how much.</p>
 <div class="paragraph">
 <p>The final algorithm that I&#8217;ll bring to your attention is <code>mp_find_index</code>.
 <code>mp_find_index&lt;L, V&gt;</code> returns an integral constant of type <code>size_t</code> with a
-value that is the index of the first occurence of <code>V</code> in <code>L</code>. If <code>V</code> is not in
+value that is the index of the first occurrence of <code>V</code> in <code>L</code>. If <code>V</code> is not in
 <code>L</code>, the return value is the size of <code>L</code>.</p>
 </div>
 <div class="paragraph">
@@ -2617,7 +2617,7 @@ needs to manipulate type lists of length 300.</p>
 <div class="paragraph">
 <p>Note that once we have <code>mp_drop</code> and <code>mp_find_index</code>, we can derive the
 <code>mp_find&lt;L, V&gt;</code> algorithm, which returns the suffix of <code>L</code> starting with the
-first occurence of <code>V</code>, if any, and an empty list otherwise, by using
+first occurrence of <code>V</code>, if any, and an empty list otherwise, by using
 <code>mp_drop&lt;L, mp_find_index&lt;L, V&gt;&gt;</code>.</p>
 </div>
 </div>
@@ -2635,7 +2635,7 @@ techniques in the process.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-12-13 23:56:45 UTC
+Last updated 2018-04-11 13:49:06 UTC
 </div>
 </div>
 <style>

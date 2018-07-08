@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.6.1">
+<meta name="generator" content="Asciidoctor 1.5.6.2">
 <meta name="author" content="Peter Dimov">
 <title>Simple C++11 metaprogramming</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
@@ -639,7 +639,7 @@ case and <code>std::packer&lt;int*, float*, void**&gt;</code> in the second.</p>
 <code>mp_list&lt;int*, float*, void**&gt;</code>, then convert that back to <code>std::tuple</code>.</p>
 </div>
 <div class="paragraph">
-<p>These conversion steps are a quite common occurence, and we&#8217;ll write a
+<p>These conversion steps are a quite common occurrence, and we&#8217;ll write a
 primitive that helps us perform them, called <code>mp_rename</code>. We want</p>
 </div>
 <div class="listingblock">
@@ -1934,7 +1934,7 @@ there is no need to enlist a metaprogramming lambda library as in</p>
 <div class="paragraph">
 <p>Finally, let me show the implementations of <code>mp_count</code> and <code>mp_count_if</code>, for
 no reason other than I find them interesting. <code>mp_count&lt;L, V&gt;</code> returns the
-number of occurences of the type <code>V</code> in the list <code>L</code>; <code>mp_count_if&lt;L, P&gt;</code>
+number of occurrences of the type <code>V</code> in the list <code>L</code>; <code>mp_count_if&lt;L, P&gt;</code>
 counts the number of types in <code>L</code> for which <code>P&lt;T&gt;</code> is <code>true</code>.</p>
 </div>
 <div class="paragraph">
@@ -2037,7 +2037,7 @@ whether the list <code>L</code> contains the type <code>V</code>:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>At first sight, this implementation appears horribly naive and inefficient&#8201;&#8212;&#8201;why would we need to count all the occurences just to throw that away if we&#8217;re
+<p>At first sight, this implementation appears horribly naive and inefficient&#8201;&#8212;&#8201;why would we need to count all the occurrences just to throw that away if we&#8217;re
 only interested in a boolean result&#8201;&#8212;&#8201;but it&#8217;s actually pretty competitive and
 perfectly usable. We just need to add one slight optimization to <code>mp_plus</code>, the
 engine behind <code>mp_count</code> and <code>mp_contains</code>:</p>
@@ -2112,7 +2112,7 @@ and demonstrate various C++11 implementation techniques in the process.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-12-13 23:56:45 UTC
+Last updated 2018-04-11 13:49:06 UTC
 </div>
 </div>
 <style>

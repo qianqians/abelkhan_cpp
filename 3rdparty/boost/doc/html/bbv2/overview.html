@@ -454,7 +454,8 @@ actions create-file-from-another
 </tbody>
 </table></div>
 </div>
-<br class="table-break"><div class="tip"><table border="0" summary="Tip">
+<br class="table-break"><p>Any of these files may also be overridden <a class="link" href="overview.html#bbv2.reference.init.options.config">on the command line</a></p>
+<div class="tip"><table border="0" summary="Tip">
 <tr>
 <td rowspan="2" align="center" valign="top" width="25"><img alt="[Tip]" src="../../../doc/src/images/tip.png"></td>
 <th align="left">Tip</th>
@@ -722,6 +723,24 @@ b2 toolset=gcc variant=debug optimization=space
               that don't depend on the failed ones.</p></dd>
 <dt><span class="term"><code class="option">-j <em class="replaceable"><code>N</code></em></code></span></dt>
 <dd><p>Run up to <em class="replaceable"><code>N</code></em> commands in parallel.</p></dd>
+<dt>
+<a name="bbv2.reference.init.options.config"></a><span class="term"><code class="option">--config=<em class="replaceable"><code>filename</code></em></code></span>
+</dt>
+<dd>
+<a class="indexterm" name="id-1.4.4.5.8.5.3.12.2.1"></a><p>Override all <a class="link" href="overview.html#bbv2.overview.configuration" title="Configuration">configuration files</a></p>
+</dd>
+<dt><span class="term"><code class="option">--site-config=<em class="replaceable"><code>filename</code></em></code></span></dt>
+<dd>
+<a class="indexterm" name="id-1.4.4.5.8.5.3.13.2.1"></a><p>Override the default <a class="link" href="overview.html#bbv2.overview.configuration" title="Configuration">site-config.jam</a></p>
+</dd>
+<dt><span class="term"><code class="option">--user-config=<em class="replaceable"><code>filename</code></em></code></span></dt>
+<dd>
+<a class="indexterm" name="id-1.4.4.5.8.5.3.14.2.1"></a><p>Override the default <a class="link" href="overview.html#bbv2.overview.configuration" title="Configuration">user-config.jam</a></p>
+</dd>
+<dt><span class="term"><code class="option">--project-config=<em class="replaceable"><code>filename</code></em></code></span></dt>
+<dd>
+<a class="indexterm" name="id-1.4.4.5.8.5.3.15.2.1"></a><p>Override the default <a class="link" href="overview.html#bbv2.overview.configuration" title="Configuration">project-config.jam</a></p>
+</dd>
 <dt><span class="term"><code class="option">--debug-configuration</code></span></dt>
 <dd><p>Produces debug information about the loading of Boost.Build
               and toolset files.</p></dd>
@@ -884,6 +903,11 @@ b2 link=static,shared threading=single,multi
 b2 include=static,shared
 </pre>
 <p>is not treated specially.</p>
+<p>Multiple features may be grouped by using a forwards slash.</p>
+<pre class="screen">
+b2 gcc/link=shared msvc/link=static,shared
+</pre>
+<p>This will build 3 different variants, altogether.</p>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h4 class="title">
