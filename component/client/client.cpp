@@ -27,16 +27,35 @@ client::client(uint64_t _xor_key)
 	_gate_call_client->sig_connect_server_sucess.connect(std::bind(&client::on_ack_connect_server, this));
 	_gate_call_client->sig_call_client.connect(std::bind(&client::on_call_client, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 	_gate_call_client->sig_ack_heartbeats.connect(std::bind(&client::on_ack_heartbeats, this));
-	auto tcp_process = std::make_shared<juggle::process>();
-	tcp_process->reg_module(_gate_call_client);
-	_tcp_conn = std::make_shared<service::connectservice>(tcp_process);
 
-	_juggleservice.add_process(tcp_process);
+	_hub_call_client = std::make_shared<module::hub_call_client>();
+	_hub_call_client->sig_call_client.connect(std::bind(&client::on_call_client, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+
+	auto _process = std::make_shared<juggle::process>();
+	_process->reg_module(_gate_call_client);
+	_conn = std::make_shared<service::connectservice>(_process);
+
+	_juggleservice.add_process(_process);
+}
+
+bool client::direct_connect_server(std::string hub_name, std::string tcp_ip, short tcp_port)
+{
+	auto dirsct_ch = std::static_pointer_cast<service::channel>(_conn->connect(tcp_ip, tcp_port));
+	dirsct_ch->is_compress_and_encrypt = true;
+	dirsct_ch->xor_key = xor_key;
+
+	auto _client_call_hub = std::make_shared<caller::client_call_hub>(dirsct_ch);
+	_client_call_hub->client_connect(uuid);
+
+
+	direct_caller_hub.insert(std::make_pair(hub_name, _client_call_hub));
+
+	return true;
 }
 
 bool client::connect_server(std::string tcp_ip, short tcp_port, int64_t tick)
 {
-	auto ch = std::static_pointer_cast<service::channel>(_tcp_conn->connect(tcp_ip, tcp_port));
+	auto ch = std::static_pointer_cast<service::channel>(_conn->connect(tcp_ip, tcp_port));
 	ch->is_compress_and_encrypt = true;
 	ch->xor_key = xor_key;
 	_client_call_gate = std::make_shared<caller::client_call_gate>(ch);
@@ -47,6 +66,13 @@ bool client::connect_server(std::string tcp_ip, short tcp_port, int64_t tick)
 
 void client::call_hub(std::string hub_name, std::string module_name, std::string func_name, std::shared_ptr<std::vector<boost::any> > _argvs)
 {
+	auto iter = direct_caller_hub.find(hub_name);
+	if (iter != direct_caller_hub.end())
+	{
+		iter->second->call_hub(uuid, module_name, func_name, _argvs);
+		return;
+	}
+
 	_client_call_gate->forward_client_call_hub(hub_name, module_name, func_name, _argvs);
 }
 
@@ -54,7 +80,7 @@ int64_t client::poll()
 {
 	auto tick = timer.poll();
 
-	_tcp_conn->poll();
+	_conn->poll();
 	
 	_juggleservice.poll();
 
