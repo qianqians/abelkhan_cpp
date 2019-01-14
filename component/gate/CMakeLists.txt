@@ -73,4 +73,4 @@ SET(SRC_LIST
 )
 
 ADD_EXECUTABLE(gate ${SRC_LIST} ${header_files})
-target_link_libraries(gate zlibstaticd)
+target_link_libraries(gate zlibstatic)

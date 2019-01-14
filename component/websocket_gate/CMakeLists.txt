@@ -76,4 +76,4 @@ SET(SRC_LIST
 )
 
 ADD_EXECUTABLE(websocket_gate ${SRC_LIST} ${header_files})
-target_link_libraries(websocket_gate zlibstaticd)
+target_link_libraries(websocket_gate zlibstatic)
