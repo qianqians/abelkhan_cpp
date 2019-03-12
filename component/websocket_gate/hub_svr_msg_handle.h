@@ -59,14 +59,21 @@ void forward_hub_call_client(std::shared_ptr<gate::clientmanager> _clientmanager
 }
 
 void forward_hub_call_group_client(std::shared_ptr<gate::clientmanager> _clientmanager, std::shared_ptr<std::vector<boost::any> > uuids, std::string module, std::string func, std::shared_ptr<std::vector<boost::any> > argv) {
+	std::vector<std::string> m_uuids;
 	for (auto uuid : *uuids) {
-		if (!_clientmanager->has_client(boost::any_cast<std::string>(uuid))) {
+		auto str_uuid = boost::any_cast<std::string>(uuid);
+		if (!_clientmanager->has_client(str_uuid)) {
+			continue;
+		}
+		if (std::find(m_uuids.begin(), m_uuids.end(), str_uuid) != m_uuids.end()) {
 			continue;
 		}
 
 		auto client_channel = _clientmanager->get_client(boost::any_cast<std::string>(uuid));
 		std::shared_ptr<caller::gate_call_client> _caller = std::make_shared<caller::gate_call_client>(client_channel);
 		_caller->call_client(module, func, argv);
+
+		m_uuids.push_back(str_uuid);
 	}
 }
 
