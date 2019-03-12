@@ -71,6 +71,7 @@ void main(int argc, char * argv[]) {
 	auto _client_call_gate = std::make_shared<module::client_call_gate>();
 	_client_call_gate->sig_connect_server.connect(boost::bind(&connect_server, _hubsvrmanager, _clientmanager, _timerservice, _1, _2));
 	_client_call_gate->sig_cancle_server.connect(boost::bind(&cancle_server, _clientmanager));
+	_client_call_gate->sig_connect_hub.connect(boost::bind(&connect_hub, _hubsvrmanager, _clientmanager, _1));
 	_client_call_gate->sig_enable_heartbeats.connect(boost::bind(&enable_heartbeats, _clientmanager));
 	_client_call_gate->sig_disable_heartbeats.connect(boost::bind(&disable_heartbeats, _clientmanager));
 	_client_call_gate->sig_heartbeats.connect(boost::bind(&heartbeats, _clientmanager, _timerservice, _1));
@@ -79,6 +80,12 @@ void main(int argc, char * argv[]) {
 	auto outside_ip = _config->get_value_string("outside_ip");
 	auto outside_port = (short)_config->get_value_int("outside_port");
 	auto _client_service = std::make_shared<service::webacceptservice>(outside_ip, outside_port, _client_process);
+	_client_service->sigchannelconnect.connect([](std::shared_ptr<juggle::Ichannel> ch) {
+		auto uuid = boost::lexical_cast<std::string>(boost::uuids::random_generator()());
+
+		auto _client_proxy = std::make_shared<caller::gate_call_client>(ch);
+		_client_proxy->ntf_uuid(uuid);
+	});
 	_client_service->sigchanneldisconnect.connect([_clientmanager](std::shared_ptr<juggle::Ichannel> ch) {
 		gate::gc_put([_clientmanager, ch]() {
 			_clientmanager->unreg_client(ch);

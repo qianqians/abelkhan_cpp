@@ -20,18 +20,31 @@ void connect_server(std::shared_ptr<gate::hubsvrmanager> _hubsvrmanager, std::sh
 
 	std::cout << "client connect " << uuid << std::endl;
 
-	_hubsvrmanager->for_each_hub([uuid](std::string hub_name, std::shared_ptr<juggle::Ichannel> ch) {
-		auto _hubproxy = std::make_shared<caller::gate_call_hub>(ch);
-		_hubproxy->client_connect(uuid);
-	});
+	//_hubsvrmanager->for_each_hub([uuid](std::string hub_name, std::shared_ptr<juggle::Ichannel> ch) {
+	//	auto _hubproxy = std::make_shared<caller::gate_call_hub>(ch);
+	//	_hubproxy->client_connect(uuid);
+	//});
 
 	_clientmanager->reg_client(uuid, juggle::current_ch, _timerservice->Tick, clienttick);
 	auto _client_proxy = std::make_shared<caller::gate_call_client>(juggle::current_ch);
-	_client_proxy->connect_server_sucess();
+	_client_proxy->connect_gate_sucess();
 }
 
 void cancle_server(std::shared_ptr<gate::clientmanager> _clientmanager) {
 	_clientmanager->unreg_client(juggle::current_ch);
+}
+
+void connect_hub(std::shared_ptr<gate::hubsvrmanager> _hubsvrmanager, std::shared_ptr<gate::clientmanager> _clientmanager, std::string hub_Name) {
+	if (!_clientmanager->has_client(juggle::current_ch)) {
+		return;
+	}
+	auto client_uuid = _clientmanager->get_client(juggle::current_ch);
+	auto _hub_ch = _hubsvrmanager->get_hub(hub_Name);
+	if (_hub_ch == nullptr) {
+		return;
+	}
+	auto _hub_proxy = std::make_shared<caller::gate_call_hub>(_hub_ch);
+	_hub_proxy->client_connect(client_uuid);
 }
 
 void enable_heartbeats(std::shared_ptr<gate::clientmanager> _clientmanager)
