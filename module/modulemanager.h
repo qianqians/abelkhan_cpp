@@ -14,7 +14,7 @@ public:
 		modules.insert(std::make_pair(module_name, module));
 	}
 
-	void process_module_mothed(std::string module_name, std::string cb_name, std::shared_ptr<std::vector<boost::any> > InArray)
+	void process_module_mothed(std::string module_name, std::string cb_name, Fossilizid::JsonParse::JsonArray InArray)
 	{
 		auto module = modules.find(module_name);
 		if (module != modules.end())

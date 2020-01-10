@@ -9,3 +9,6 @@
 [submodule "tools/juggle"]
 	path = tools/juggle
 	url = https://github.com/qianqians/juggle.git
+[submodule "3rdparty/enet"]
+	path = 3rdparty/enet
+	url = https://github.com/lsalzman/enet.git

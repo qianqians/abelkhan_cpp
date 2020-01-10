@@ -1,6 +1,6 @@
 /*this caller file is codegen by juggle for c++*/
-#ifndef _gate_call_client_caller_h
-#define _gate_call_client_caller_h
+#ifndef _gm_center_caller_h
+#define _gm_center_caller_h
 #include <sstream>
 #include <tuple>
 #include <string>
@@ -12,57 +12,50 @@
 
 namespace caller
 {
-class gate_call_client : public juggle::Icaller {
+class gm_center : public juggle::Icaller {
 public:
-    gate_call_client(std::shared_ptr<juggle::Ichannel> _ch) : Icaller(_ch) {
-        module_name = "gate_call_client";
+    gm_center(std::shared_ptr<juggle::Ichannel> _ch) : Icaller(_ch) {
+        module_name = "gm_center";
     }
 
-    ~gate_call_client(){
+    ~gm_center(){
     }
 
-    void ntf_uuid(std::string argv0){
+    void confirm_gm(std::string argv0){
         auto v = Fossilizid::JsonParse::Make_JsonArray();
-        v->push_back("gate_call_client");
-        v->push_back("ntf_uuid");
+        v->push_back("gm_center");
+        v->push_back("confirm_gm");
         v->push_back(Fossilizid::JsonParse::Make_JsonArray());
         (std::any_cast<Fossilizid::JsonParse::JsonArray>((*v)[2]))->push_back(argv0);
         ch->push(v);
     }
 
-    void connect_gate_sucess(){
+    void close_clutter(std::string argv0){
         auto v = Fossilizid::JsonParse::Make_JsonArray();
-        v->push_back("gate_call_client");
-        v->push_back("connect_gate_sucess");
-        v->push_back(Fossilizid::JsonParse::Make_JsonArray());
-        ch->push(v);
-    }
-
-    void connect_hub_sucess(std::string argv0){
-        auto v = Fossilizid::JsonParse::Make_JsonArray();
-        v->push_back("gate_call_client");
-        v->push_back("connect_hub_sucess");
+        v->push_back("gm_center");
+        v->push_back("close_clutter");
         v->push_back(Fossilizid::JsonParse::Make_JsonArray());
         (std::any_cast<Fossilizid::JsonParse::JsonArray>((*v)[2]))->push_back(argv0);
         ch->push(v);
     }
 
-    void ack_heartbeats(){
+    void close_zone(std::string argv0,int64_t argv1){
         auto v = Fossilizid::JsonParse::Make_JsonArray();
-        v->push_back("gate_call_client");
-        v->push_back("ack_heartbeats");
-        v->push_back(Fossilizid::JsonParse::Make_JsonArray());
-        ch->push(v);
-    }
-
-    void call_client(std::string argv0,std::string argv1,Fossilizid::JsonParse::JsonArray argv2){
-        auto v = Fossilizid::JsonParse::Make_JsonArray();
-        v->push_back("gate_call_client");
-        v->push_back("call_client");
+        v->push_back("gm_center");
+        v->push_back("close_zone");
         v->push_back(Fossilizid::JsonParse::Make_JsonArray());
         (std::any_cast<Fossilizid::JsonParse::JsonArray>((*v)[2]))->push_back(argv0);
         (std::any_cast<Fossilizid::JsonParse::JsonArray>((*v)[2]))->push_back(argv1);
-        (std::any_cast<Fossilizid::JsonParse::JsonArray>((*v)[2]))->push_back(argv2);
+        ch->push(v);
+    }
+
+    void reload(std::string argv0,std::string argv1){
+        auto v = Fossilizid::JsonParse::Make_JsonArray();
+        v->push_back("gm_center");
+        v->push_back("reload");
+        v->push_back(Fossilizid::JsonParse::Make_JsonArray());
+        (std::any_cast<Fossilizid::JsonParse::JsonArray>((*v)[2]))->push_back(argv0);
+        (std::any_cast<Fossilizid::JsonParse::JsonArray>((*v)[2]))->push_back(argv1);
         ch->push(v);
     }
 

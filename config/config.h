@@ -43,7 +43,7 @@ public:
 	}
 
 private:
-	config(boost::any _handle) {
+	config(std::any _handle) {
 		handle = _handle;
 	}
 
@@ -53,7 +53,7 @@ private:
 
 public:
 	bool has_key(std::string key) {
-		(Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonTable>(handle))->find(key) == (Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonTable>(handle))->end();
+		return (Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonTable>(handle))->find(key) == (Fossilizid::JsonParse::JsonCast<Fossilizid::JsonParse::JsonTable>(handle))->end();
 	}
 
 	bool get_value_bool(std::string key) {
@@ -114,7 +114,7 @@ public:
 	}
 
 private:
-	boost::any handle;
+	std::any handle;
 
 };
 

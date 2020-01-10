@@ -1,6 +1,6 @@
 /*this caller file is codegen by juggle for c++*/
-#ifndef _center_caller_h
-#define _center_caller_h
+#ifndef _hub_call_client_caller_h
+#define _hub_call_client_caller_h
 #include <sstream>
 #include <tuple>
 #include <string>
@@ -12,24 +12,23 @@
 
 namespace caller
 {
-class center : public juggle::Icaller {
+class hub_call_client : public juggle::Icaller {
 public:
-    center(std::shared_ptr<juggle::Ichannel> _ch) : Icaller(_ch) {
-        module_name = "center";
+    hub_call_client(std::shared_ptr<juggle::Ichannel> _ch) : Icaller(_ch) {
+        module_name = "hub_call_client";
     }
 
-    ~center(){
+    ~hub_call_client(){
     }
 
-    void reg_server(std::string argv0,std::string argv1,int64_t argv2,std::string argv3){
+    void call_client(std::string argv0,std::string argv1,Fossilizid::JsonParse::JsonArray argv2){
         auto v = Fossilizid::JsonParse::Make_JsonArray();
-        v->push_back("center");
-        v->push_back("reg_server");
+        v->push_back("hub_call_client");
+        v->push_back("call_client");
         v->push_back(Fossilizid::JsonParse::Make_JsonArray());
         (std::any_cast<Fossilizid::JsonParse::JsonArray>((*v)[2]))->push_back(argv0);
         (std::any_cast<Fossilizid::JsonParse::JsonArray>((*v)[2]))->push_back(argv1);
         (std::any_cast<Fossilizid::JsonParse::JsonArray>((*v)[2]))->push_back(argv2);
-        (std::any_cast<Fossilizid::JsonParse::JsonArray>((*v)[2]))->push_back(argv3);
         ch->push(v);
     }
 

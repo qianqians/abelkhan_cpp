@@ -9,7 +9,7 @@
 #include <websocketpp/connection.hpp>
 #include <websocketpp/server.hpp>
 
-#include "swapque.h"
+#include "msque.h"
 #include "JsonParse.h"
 #include "Ichannel.h"
 
@@ -73,7 +73,7 @@ public:
 					{
 						Fossilizid::JsonParse::JsonObject obj;
 						Fossilizid::JsonParse::unpacker(obj, json_str);
-						que.push(boost::any_cast<Fossilizid::JsonParse::JsonArray>(obj));
+						que.push(std::any_cast<Fossilizid::JsonParse::JsonArray>(obj));
 					}
 					catch (Fossilizid::JsonParse::jsonformatexception e)
 					{
@@ -118,7 +118,7 @@ public:
 		}
 	}
 
-	bool pop(std::shared_ptr<std::vector<boost::any> >  & out)
+	bool pop(Fossilizid::JsonParse::JsonArray  & out)
 	{
 		if (que.empty())
 		{
@@ -128,14 +128,15 @@ public:
 		return que.pop(out);
 	}
 
-	void push(std::shared_ptr<std::vector<boost::any> > in)
+	void push(Fossilizid::JsonParse::JsonArray in)
 	{
 		if (is_close) {
 			return;
 		}
 
 		try {
-			auto data = Fossilizid::JsonParse::pack(in);
+			std::string data;
+			Fossilizid::JsonParse::pack(in, data);
 			size_t len = data.size();
 			unsigned char * _data = new unsigned char[len + 4];
 			_data[0] = len & 0xff;
@@ -156,7 +157,7 @@ public:
 	}
 
 private:
-	Fossilizid::container::swapque< std::shared_ptr<std::vector<boost::any> > > que;
+	Fossilizid::container::msque< Fossilizid::JsonParse::JsonArray > que;
 
 	std::shared_ptr<websocketpp::server<websocketpp::config::asio> > server;
 	websocketpp::connection_hdl hdl;

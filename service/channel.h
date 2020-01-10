@@ -4,9 +4,9 @@
 
 #include <list>
 #include <iostream>
+#include <any>
 
 #include <boost/asio.hpp>
-#include <boost/any.hpp>
 #include <boost/bind.hpp>
 #include <boost/signals2.hpp>
 #include <boost/thread.hpp>
@@ -114,7 +114,7 @@ private:
 					{
 						Fossilizid::JsonParse::JsonObject obj;
 						Fossilizid::JsonParse::unpacker(obj, json_str);
-						que.push_back(boost::any_cast<Fossilizid::JsonParse::JsonArray>(obj));
+						que.push_back(std::any_cast<Fossilizid::JsonParse::JsonArray>(obj));
 					}
 					catch (Fossilizid::JsonParse::jsonformatexception e)
 					{
@@ -163,7 +163,7 @@ public:
 		}
 	}
 
-	bool pop(std::shared_ptr<std::vector<boost::any> >  & out)
+	bool pop(Fossilizid::JsonParse::JsonArray  & out)
 	{
 		if (que.empty())
 		{
@@ -176,7 +176,7 @@ public:
 		return true;
 	}
 
-	void push(std::shared_ptr<std::vector<boost::any> > in)
+	void push(Fossilizid::JsonParse::JsonArray in)
 	{
 		if (is_close) {
 			return;
@@ -187,7 +187,8 @@ public:
 		}
 
 		try {
-			auto data = Fossilizid::JsonParse::pack(in);
+			std::string data;
+			Fossilizid::JsonParse::pack(in, data);
 			if (!is_compress_and_encrypt)
 			{
 				size_t len = data.size();
@@ -259,7 +260,7 @@ public:
 	}
 
 private:
-	std::list< std::shared_ptr<std::vector<boost::any> > > que;
+	std::list< Fossilizid::JsonParse::JsonArray > que;
 
 	std::shared_ptr<boost::asio::ip::tcp::socket> s;
 

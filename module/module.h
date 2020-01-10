@@ -7,23 +7,24 @@
 #include <vector>
 #include <map>
 #include <functional>
+#include <any>
 
-#include <boost/any.hpp>
+#include <JsonParse.h>
 
 namespace common
 {
 
 class imodule {
 protected:
-	std::map<std::string, std::function< void( std::shared_ptr<std::vector<boost::any> > ) > > cbs;
+	std::map<std::string, std::function< void( Fossilizid::JsonParse::JsonArray ) > > cbs;
 
-	void reg_cb(std::string cb_name, std::function< void( std::shared_ptr<std::vector<boost::any> > ) > cb)
+	void reg_cb(std::string cb_name, std::function< void(Fossilizid::JsonParse::JsonArray) > cb)
 	{
 		cbs.insert(std::make_pair(cb_name, cb));
 	}
 
 public:
-	void invoke(std::string cb_name, std::shared_ptr<std::vector<boost::any> > InArray)
+	void invoke(std::string cb_name, Fossilizid::JsonParse::JsonArray InArray)
 	{
 		auto cb = cbs.find(cb_name);
 		if (cb != cbs.end())
