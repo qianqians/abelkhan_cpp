@@ -12,8 +12,10 @@
 
 #include <Imodule.h>
 
-#include "gatemanager.h"
 #include "hub.h"
+#include "gatemanager.h"
+
+namespace gate_msg{
 
 void reg_hub_sucess() {
 	std::cout << "connect gate sucess" << std::endl;
@@ -32,10 +34,12 @@ void client_exception(std::shared_ptr<hub::gatemanager> gates, std::string clien
 	gates->client_exception(client_uuid);
 }
 
-void client_call_hub(std::shared_ptr<hub::hub> _hub, std::string uuid, std::string _module, std::string func, Fossilizid::JsonParse::JsonArray argv) {
+void client_call_hub(std::shared_ptr<hub::hub_service> _hub, std::string uuid, std::string _module, std::string func, Fossilizid::JsonParse::JsonArray argv) {
 	hub::current_client_uuid = uuid;
 	_hub->modules.process_module_mothed(_module, func, argv);
 	hub::current_client_uuid = "";
+}
+
 }
 
 #endif //_gate_msg_handle_h

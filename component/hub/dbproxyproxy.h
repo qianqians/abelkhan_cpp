@@ -22,7 +22,7 @@
 
 namespace hub{
 
-class dbproxyproxy {
+class dbproxyproxy : public std::enable_shared_from_this<dbproxyproxy> {
 public:
 	dbproxyproxy(std::shared_ptr<juggle::Ichannel> ch) {
 		_dbproxy_ch = ch;
@@ -83,7 +83,7 @@ public:
 	}
 
 	std::shared_ptr<Collection> getCollection(std::string db, std::string collection) {
-		return std::make_shared<Collection>(db, collection, this);
+		return std::make_shared<Collection>(db, collection, shared_from_this());
 	}
 
 	std::unordered_map<std::string, std::function<void(bool)> > create_persisted_object_callback;

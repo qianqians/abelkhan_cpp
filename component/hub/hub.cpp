@@ -3,135 +3,167 @@
  * 2020-1-10
  * hub.cpp
  */
+
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/thread.hpp>
+
+#include "hub_call_hubmodule.h"
+#include "center_call_hubmodule.h"
+#include "center_call_servermodule.h"
+#include "gate_call_hubmodule.h"
+#include "dbproxy_call_hubmodule.h"
+
 #include "hub.h"
 #include "centerproxy.h"
-#include "closehandle.h"
-#include "hubsvrmanager.h"
 #include "center_msg_handle.h"
+#include "dbproxyproxy.h"
+#include "dbproxy_msg_handle.h"
+#include "hubsvrmanager.h"
 #include "hub_svr_msg_handle.h"
+#include "gatemanager.h"
+#include "gate_msg_handle.h"
 #include "gc_poll.h"
 
 namespace hub{
 
-hub_service::hub_service() {
-	
+hub_service::hub_service(std::string config_file_path, std::string config_name) {
+	uuid = boost::lexical_cast<std::string>(boost::uuids::random_generator()());
+
+	_config = std::make_shared<config::config>(config_file_path);
+	_center_config = _config->get_value_dict("center");
+	_root_config = _config;
+	_config = _config->get_value_dict(config_name);
+
+	name = _config->get_value_string("hub_name");
 }
 
-void hub_service::poll() {
+void hub_service::init() {
+	enet_initialize();
 
+	_timerservice = std::make_shared<service::timerservice>();
+	close_handle = std::make_shared<closehandle>();
+	hubs = std::make_shared<hubsvrmanager>(shared_from_this());
+
+	auto ip = _config->get_value_string("ip");
+	auto port = _config->get_value_int("port");
+	auto hub_call_hub = std::make_shared<module::hub_call_hub>();
+	hub_call_hub->sig_reg_hub.connect(std::bind(hub_msg::reg_hub, hubs, std::placeholders::_1));
+	hub_call_hub->sig_reg_hub_sucess.connect(std::bind(hub_msg::reg_hub_sucess));
+	hub_call_hub->sig_hub_call_hub_mothed.connect(std::bind(hub_msg::hub_call_hub_mothed, shared_from_this(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+	auto hub_process = std::make_shared<juggle::process>();
+	hub_process->reg_module(hub_call_hub);
+	_hub_service = std::make_shared<service::enetacceptservice>(ip, port, hub_process);
+
+	_center_process = std::make_shared<juggle::process>();
+	_center_service = std::make_shared<service::connectservice>(_center_process);
+
+	auto gate_process = std::make_shared<juggle::process>();
+	_gate_service = std::make_shared<service::enetconnectservice>(gate_process);
+	gates = std::make_shared<gatemanager>(_gate_service, shared_from_this());
+	auto gate_call_hub = std::make_shared<module::gate_call_hub>();
+	gate_call_hub->sig_reg_hub_sucess.connect(std::bind(gate_msg::reg_hub_sucess));
+	gate_call_hub->sig_client_connect.connect(std::bind(gate_msg::client_connect, gates, std::placeholders::_1));
+	gate_call_hub->sig_client_disconnect.connect(std::bind(gate_msg::client_disconnect, gates, std::placeholders::_1));
+	gate_call_hub->sig_client_exception.connect(std::bind(gate_msg::client_exception, gates, std::placeholders::_1));
+	gate_call_hub->sig_client_call_hub.connect(std::bind(gate_msg::client_call_hub, shared_from_this(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
+	gate_process->reg_module(gate_call_hub);
+
+	_juggleservice = std::make_shared<service::juggleservice>();
+	_juggleservice->add_process(hub_process);
+	_juggleservice->add_process(_center_process);
+	_juggleservice->add_process(gate_process);
 }
 
+void hub_service::connect_center() {
+	std::cout << "begin on connect center" << std::endl;
+
+	auto ip = _center_config->get_value_string("ip");
+	auto port = _center_config->get_value_int("port");
+	auto center_ch = _center_service->connect(ip, port);
+
+	_centerproxy = std::make_shared<centerproxy>(center_ch);
+
+	auto center_call_hub = std::make_shared<module::center_call_hub>();
+	auto center_call_server = std::make_shared<module::center_call_server>();
+	center_call_server->sig_reg_server_sucess.connect(std::bind(center_msg::reg_server_sucess, _centerproxy));
+	center_call_server->sig_close_server.connect(std::bind(center_msg::close_server, close_handle));
+	center_call_hub->sig_distribute_server_address.connect(std::bind(center_msg::distribute_server_address, shared_from_this(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
+	center_call_hub->sig_reload.connect(std::bind(center_msg::reload, shared_from_this(), std::placeholders::_1));
+	_center_process->reg_module(center_call_hub);
+	_center_process->reg_module(center_call_server);
+
+	_centerproxy->reg_server(_config->get_value_string("ip"), _config->get_value_int("port"), uuid);
+
+	std::cout << "end on connect center" << std::endl;
 }
 
-/*
-void main(int argc, char * argv[]) {
-	auto svr_uuid = boost::lexical_cast<std::string>(boost::uuids::random_generator()());
-	
-	if (argc <= 1) {
-		std::cout << "non input start argv" << std::endl;
+void hub_service::connect_gate(std::string uuid, std::string ip, uint16_t port) {
+	gates->connect_gate(uuid, ip, port);
+}
+
+void hub_service::reg_hub(std::string hub_ip, uint16_t hub_port) {
+	_hub_service->connect(hub_ip, hub_port, [this](std::shared_ptr<juggle::Ichannel> ch){
+		auto caller = std::make_shared< caller::hub_call_hub>(ch);
+		caller->reg_hub(name);
+	});
+}
+
+void hub_service::try_connect_db(std::string dbproxy_ip, uint16_t dbproxy_port) {
+	if (!_config->has_key("dbproxy")) {
 		return;
 	}
 
-	std::string config_file_path = argv[1];
-	auto _config = std::make_shared<config::config>(config_file_path);
-	auto _center_config = _config->get_value_dict("center");
-	if (argc >= 3) {
-		_config = _config->get_value_dict(argv[2]);
+	auto dbproxy_cfg = _root_config->get_value_dict(_config->get_value_string("dbproxy"));
+	auto _db_ip = dbproxy_cfg->get_value_string("ip");
+	auto _db_port = dbproxy_cfg->get_value_int("port");
+	if (dbproxy_ip != _db_ip || dbproxy_port != _db_port) {
+		return;
 	}
 
-	std::shared_ptr<service::timerservice> _timerservice = std::make_shared<service::timerservice>();
+	auto dbproxy_process = std::make_shared<juggle::process>();
+	_dbproxy_service = std::make_shared<service::connectservice>(dbproxy_process);
+	auto ch = _dbproxy_service->connect(_db_ip, _db_port);
+	_dbproxyproxy = std::make_shared<dbproxyproxy>(ch);
 
-	auto inside_ip = _config->get_value_string("inside_ip");
-	auto inside_port = (short)_config->get_value_int("inside_port");
-	auto _hub_process = std::make_shared<juggle::process>();
-	auto _hub_call_gate = std::make_shared<module::hub_call_gate>();
-	auto _hubsvrmanager = std::make_shared<gate::hubsvrmanager>();
-	auto _clientmanager = std::make_shared<gate::clientmanager>(_hubsvrmanager);
-	_hub_call_gate->sig_reg_hub.connect(boost::bind(&reg_hub, _hubsvrmanager, _1, _2));
-	_hub_call_gate->sig_connect_sucess.connect(boost::bind(&connect_sucess, _clientmanager, _hubsvrmanager, _1));
-	_hub_call_gate->sig_disconnect_client.connect(boost::bind(&disconnect_client, _clientmanager, _1));
-	_hub_call_gate->sig_forward_hub_call_client.connect(boost::bind(&forward_hub_call_client, _clientmanager, _1, _2, _3, _4));
-	_hub_call_gate->sig_forward_hub_call_group_client.connect(boost::bind(&forward_hub_call_group_client, _clientmanager, _1, _2, _3, _4));
-	_hub_call_gate->sig_forward_hub_call_global_client.connect(boost::bind(&forward_hub_call_global_client, _clientmanager, _1, _2, _3));
-	_hub_process->reg_module(_hub_call_gate);
-	auto _hub_service = std::make_shared<service::acceptservice>(inside_ip, inside_port, _hub_process);
+	auto dbproxy_call_hub = std::make_shared<module::dbproxy_call_hub>();
+	dbproxy_call_hub->sig_reg_hub_sucess.connect(std::bind(db_msg::reg_hub_sucess));
+	dbproxy_call_hub->sig_ack_create_persisted_object.connect(std::bind(db_msg::ack_create_persisted_object, _dbproxyproxy, std::placeholders::_1, std::placeholders::_2));
+	dbproxy_call_hub->sig_ack_updata_persisted_object.connect(std::bind(db_msg::ack_updata_persisted_objec, _dbproxyproxy, std::placeholders::_1));
+	dbproxy_call_hub->sig_ack_get_object_count.connect(std::bind(db_msg::ack_get_object_count, _dbproxyproxy, std::placeholders::_1, std::placeholders::_2));
+	dbproxy_call_hub->sig_ack_get_object_info.connect(std::bind(db_msg::ack_get_object_info, _dbproxyproxy, std::placeholders::_1, std::placeholders::_2));
+	dbproxy_call_hub->sig_ack_get_object_info_end.connect(std::bind(db_msg::ack_get_object_info_end, _dbproxyproxy, std::placeholders::_1));
+	dbproxy_call_hub->sig_ack_remove_object.connect(std::bind(db_msg::ack_remove_object, _dbproxyproxy, std::placeholders::_1));
 
-	auto _client_process = std::make_shared<juggle::process>();
-	auto _client_call_gate = std::make_shared<module::client_call_gate>();
-	_client_call_gate->sig_connect_server.connect(boost::bind(&connect_server, _hubsvrmanager, _clientmanager, _timerservice, _1, _2));
-	_client_call_gate->sig_cancle_server.connect(boost::bind(&cancle_server, _clientmanager));
-	_client_call_gate->sig_connect_hub.connect(boost::bind(&connect_hub, _hubsvrmanager, _clientmanager, _1));
-	_client_call_gate->sig_enable_heartbeats.connect(boost::bind(&enable_heartbeats, _clientmanager));
-	_client_call_gate->sig_disable_heartbeats.connect(boost::bind(&disable_heartbeats, _clientmanager));
-	_client_call_gate->sig_heartbeats.connect(boost::bind(&heartbeats, _clientmanager, _timerservice, _1));
-	_client_call_gate->sig_forward_client_call_hub.connect(boost::bind(&forward_client_call_hub, _clientmanager, _hubsvrmanager, _1, _2, _3, _4));
-	_client_process->reg_module(_client_call_gate);
-	auto outside_ip = _config->get_value_string("outside_ip");
-	auto outside_port = (short)_config->get_value_int("outside_port");
-	auto _client_service = std::make_shared<service::webacceptservice>(outside_ip, outside_port, _client_process);
-	_client_service->sigchannelconnect.connect([](std::shared_ptr<juggle::Ichannel> ch) {
-		auto uuid = boost::lexical_cast<std::string>(boost::uuids::random_generator()());
+	dbproxy_process->reg_module(dbproxy_call_hub);
+	_juggleservice->add_process(dbproxy_process);
+}
 
-		auto _client_proxy = std::make_shared<caller::gate_call_client>(ch);
-		_client_proxy->ntf_uuid(uuid);
-	});
-	_client_service->sigchanneldisconnect.connect([_clientmanager](std::shared_ptr<juggle::Ichannel> ch) {
-		gate::gc_put([_clientmanager, ch]() {
-			_clientmanager->unreg_client(ch);
-		});
-	});
-
-	std::shared_ptr<juggle::process> _center_process = std::make_shared<juggle::process>();
-	auto _connectnetworkservice = std::make_shared<service::connectservice>(_center_process);
-	auto center_ip = _center_config->get_value_string("ip");
-	auto center_port = (short)_center_config->get_value_int("port");
-	auto _center_ch = _connectnetworkservice->connect(center_ip, center_port);
-	auto _centerproxy = std::make_shared<gate::centerproxy>(_center_ch);
-	std::shared_ptr<gate::closehandle> _closehandle = std::make_shared<gate::closehandle>();
-	auto _center_call_server = std::make_shared<module::center_call_server>();
-	_center_call_server->sig_reg_server_sucess.connect(std::bind(&reg_server_sucess, _centerproxy));
-	_center_call_server->sig_close_server.connect(std::bind(&close_server, _closehandle));
-	_center_process->reg_module(_center_call_server);
-	_centerproxy->reg_server(inside_ip, inside_port, svr_uuid);
-
-	std::shared_ptr<service::juggleservice> _juggleservice = std::make_shared<service::juggleservice>();
-	_juggleservice->add_process(_center_process);
-	_juggleservice->add_process(_hub_process);
-	_juggleservice->add_process(_client_process);
-
-	_timerservice->addticktimer(5 * 1000, std::bind(&heartbeat_handle, _clientmanager, _timerservice, std::placeholders::_1));
-
-	while (true){
-		clock_t begin = clock();
+void hub_service::poll() {
+	auto time_now = msec_time();
+	while (1) {
 		try {
-			_connectnetworkservice->poll();
 			_hub_service->poll();
-			_client_service->poll();
-
-			_juggleservice->poll();
+			_center_service->poll();
+			_gate_service->poll();
+			_dbproxy_service->poll();
 
 			_timerservice->poll();
+
+			_juggleservice->poll();
 		}
-		catch(std::exception e) {
-			std::cout << e.what() << std::endl;
+		catch (std::exception err) {
+			std::cout << "error:" << err.what() << std::endl;
 		}
 
-		try {
-			_client_service->gc_poll();
-			gate::gc_poll();
-		}
-		catch (std::exception e) {
-			std::cout << e.what() << std::endl;
-		}
-
-		if (_closehandle->is_closed) {
-			std::cout << "server closed, gate server " << svr_uuid << std::endl;
-			break;
-		}
-		
-		if ((clock() - begin) < 50){
-			boost::this_thread::sleep(boost::get_system_time() + boost::posix_time::microseconds(5));
+		if (close_handle->is_closed) {
+			_timerservice->addticktimer(2000, [](uint64_t timetmp) {
+				exit(0);
+			});
 		}
 	}
 }
-*/
+
+}

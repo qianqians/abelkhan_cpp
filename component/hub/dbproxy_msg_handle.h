@@ -9,6 +9,8 @@
 
 #include "dbproxyproxy.h"
 
+namespace db_msg {
+
 void reg_hub_sucess() {
 	std::cout << "connect db sucess" << std::endl;
 	//this.hub.onConnectDB_event();
@@ -48,6 +50,8 @@ void ack_remove_object(std::shared_ptr<hub::dbproxyproxy> proxy, std::string cal
 	auto cb = proxy->remove_object_callback[callbackid];
 	cb();
 	proxy->remove_object_callback.erase(callbackid);
+}
+
 }
 
 
